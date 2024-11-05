@@ -93,7 +93,7 @@ $(document).ready(function() {
 
 	$('#formLogin').validate({
         rules: {
-            username: {
+            email: {
                 required: true,
                 minlength: 3,
                 maxlength: 30
@@ -104,7 +104,7 @@ $(document).ready(function() {
             }
         },
         messages: {
-            username: {
+            email: {
                 required: "Esse campo é obrigatório!",
                 minlength: "O campo nome não pode ter menos que 3 caracteres"
             },
