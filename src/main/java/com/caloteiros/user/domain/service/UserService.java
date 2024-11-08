@@ -1,7 +1,7 @@
 package com.caloteiros.user.domain.service;
 
 import com.caloteiros.user.domain.entities.User;
-import com.caloteiros.user.domain.exceptions.UserAlreadyExistsException;
+import com.caloteiros.user.domain.exceptions.UserException;
 import com.caloteiros.user.domain.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +18,7 @@ public class UserService {
 
     public void createUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("Email já registrado");
+            throw new UserException("Email já registrado");
         }
 
         String hash = passwordEncoder.encode(user.getPassword());

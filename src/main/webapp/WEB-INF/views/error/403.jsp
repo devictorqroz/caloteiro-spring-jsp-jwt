@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erro de Caloteiro</title>
+    <title>Acesso não autorizado</title>
     <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/error.css">
 </head>
@@ -17,7 +17,7 @@
     <main>
         <h1>${error}</h1>
         <p>${message}</p>
-        <a href="/menu">Retornar ao Menu</a>
+        <a href="/auth/login">Login</a>
     </main>
     <footer>
        <c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />

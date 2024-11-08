@@ -4,7 +4,7 @@ import com.caloteiros.shared.auth.dto.LoginRequestDTO;
 import com.caloteiros.shared.auth.dto.RegisterRequestDTO;
 import com.caloteiros.shared.security.jwt.TokenService;
 import com.caloteiros.user.domain.entities.User;
-import com.caloteiros.user.domain.exceptions.UserAlreadyExistsException;
+import com.caloteiros.user.domain.exceptions.UserException;
 import com.caloteiros.user.domain.repositories.UserRepository;
 import com.caloteiros.user.domain.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -107,7 +107,7 @@ public class AuthController {
 
         try {
             userService.createUser(user);
-        } catch (UserAlreadyExistsException e) {
+        } catch (UserException e) {
             model.addAttribute("errors", Collections.singletonList(e.getMessage()));
             return "auth/register";
         }

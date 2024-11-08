@@ -1,7 +1,7 @@
 package com.caloteiros.caloteiro.domain.services;
 
 import com.caloteiros.caloteiro.domain.entities.Caloteiro;
-import com.caloteiros.caloteiro.domain.exceptions.CaloteiroNotFoundException;
+import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.caloteiro.domain.repositories.CaloteiroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class CaloteiroService {
 
     public Caloteiro findById(Long caloteiroId) {
         return caloteiroRepository.findById(caloteiroId)
-            .orElseThrow(() -> new CaloteiroNotFoundException("Caloteiro não encontrado com o ID: " + caloteiroId));
+            .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + caloteiroId));
     }
 
     public void create(Caloteiro caloteiro) {
@@ -33,7 +33,7 @@ public class CaloteiroService {
 
     public void update(Caloteiro updateCaloteiro) {
         Caloteiro caloteiro = caloteiroRepository.findById(updateCaloteiro.getId())
-                .orElseThrow(() -> new CaloteiroNotFoundException("Caloteiro não encontrado com o ID: " + updateCaloteiro.getId()));
+                .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + updateCaloteiro.getId()));
 
         updateFields(updateCaloteiro, caloteiro);
 

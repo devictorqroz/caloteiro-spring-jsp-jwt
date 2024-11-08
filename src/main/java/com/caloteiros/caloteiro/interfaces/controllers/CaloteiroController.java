@@ -3,7 +3,7 @@ package com.caloteiros.caloteiro.interfaces.controllers;
 import com.caloteiros.caloteiro.application.dto.CaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CaloteiroMinDTO;
 import com.caloteiros.caloteiro.domain.entities.Caloteiro;
-import com.caloteiros.caloteiro.domain.exceptions.CaloteiroNotFoundException;
+import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.caloteiro.domain.services.CaloteiroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class CaloteiroController {
             Caloteiro caloteiroToUpdate = caloteiroService.findById(id);
             mv.setViewName("caloteiros/update-caloteiro");
             mv.addObject("caloteiro", caloteiroToUpdate);
-        } catch  (CaloteiroNotFoundException e) {
+        } catch  (CaloteiroException e) {
             mv.setViewName("error/caloteiro-error");
             mv.addObject("errorMessage", e.getMessage());
         }
