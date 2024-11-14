@@ -26,35 +26,35 @@
 				<tr><th>ID</th><th>Nome</th><th>Email</th><th>Devendo</th><th>Data Dívida</th><th>Editar</th><th>Excluir</th></tr>
 				<c:forEach var="caloteiro" items="${caloteiros}" varStatus="id">
 					<tr>
-						<td>${caloteiro.id}</td> 
+						<td>${caloteiro.id()}</td>
 						<c:choose>
-							<c:when test="${not empty caloteiro.name}">
-								<td>${caloteiro.name}</td>
+							<c:when test="${not empty caloteiro.name()}">
+								<td>${caloteiro.name()}</td>
 							</c:when>
 							<c:otherwise>
 								<td>Nome não preenchido.</td>
 							</c:otherwise>
 						</c:choose>
 						<c:choose>
-							<c:when test="${not empty caloteiro.email}">
-								<td><a href="#">${caloteiro.email}</a></td>
+							<c:when test="${not empty caloteiro.email()}">
+								<td><a href="#">${caloteiro.email()}</a></td>
 							</c:when>
 							<c:otherwise>
 								<td>E-mail não preenchido.</td>
 							</c:otherwise>
 						</c:choose>
 						<c:choose>
-							<c:when test="${not empty caloteiro.debt}">
-								<td>${caloteiro.debt}</td>
+							<c:when test="${not empty caloteiro.debt()}">
+								<td>${caloteiro.debt()}</td>
 							</c:when>
 							<c:otherwise>
 								<td>Devendo não preenchido.</td>
 							</c:otherwise>
 						</c:choose>
 						<c:choose>
-							<c:when test="${not empty caloteiro.debtDate}">
+							<c:when test="${not empty caloteiro.debtDate()}">
 								<td>
-									 ${fn:formatLocalDate(caloteiro.debtDate, 'dd/MM/yyyy')}
+									 ${fn:formatLocalDate(caloteiro.debtDate(), 'dd/MM/yyyy')}
 								</td>
 							</c:when>
 							<c:otherwise>
@@ -62,12 +62,12 @@
 							</c:otherwise>
 						</c:choose>
 						<td>
-							<form action="/caloteiros/${caloteiro.id}/edit" method="GET">
+							<form action="/caloteiros/${caloteiro.id()}/edit" method="GET">
 								<input type="submit" id="updateButton" value="Editar" />
 							</form>
 						</td>
 						<td>
-							<form action="/caloteiros/${caloteiro.id}" method="POST">
+							<form action="/caloteiros/${caloteiro.id()}" method="POST">
 								<input type="hidden" name="_method" value="DELETE" />
 								<input type="submit" id="deleteButton" value="Excluir" />
 							</form>

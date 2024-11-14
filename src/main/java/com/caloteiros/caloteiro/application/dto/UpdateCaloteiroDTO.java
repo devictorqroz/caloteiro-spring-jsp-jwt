@@ -9,8 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CaloteiroDTO(
-
+public record UpdateCaloteiroDTO(
         Long id,
 
         @NotBlank(message = "O nome é obrigatório.")

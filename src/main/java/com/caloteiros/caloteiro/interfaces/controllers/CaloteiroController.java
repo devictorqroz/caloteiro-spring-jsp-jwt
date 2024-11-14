@@ -1,8 +1,8 @@
 package com.caloteiros.caloteiro.interfaces.controllers;
 
+import com.caloteiros.caloteiro.application.dto.UpdateCaloteiroDTO;
+import com.caloteiros.caloteiro.application.dto.CreateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CaloteiroDTO;
-import com.caloteiros.caloteiro.application.dto.CaloteiroMinDTO;
-import com.caloteiros.caloteiro.domain.entities.Caloteiro;
 import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.caloteiro.domain.services.CaloteiroService;
 import jakarta.validation.Valid;
@@ -23,7 +23,7 @@ public class CaloteiroController {
 
     @GetMapping
     public ModelAndView findAll() {
-        List<Caloteiro> caloteiros = caloteiroService.findAll();
+        List<CaloteiroDTO> caloteiros = caloteiroService.list();
         ModelAndView mv = new ModelAndView("caloteiros/list-caloteiros");
         mv.addObject("caloteiros", caloteiros);
         return mv;
@@ -37,7 +37,7 @@ public class CaloteiroController {
 
     @PostMapping
     public ModelAndView createCaloteiro(
-            @Valid @ModelAttribute CaloteiroMinDTO newCaloteiroRequest,
+            @Valid @ModelAttribute CreateCaloteiroDTO createCaloteiroDTO,
             BindingResult bindingResult) {
         ModelAndView mv = new ModelAndView();
 
@@ -46,17 +46,10 @@ public class CaloteiroController {
             return mv;
         }
 
-        Caloteiro caloteiro = newCaloteiroRequest.toCaloteiro();
-        this.caloteiroService.create(caloteiro);
+        this.caloteiroService.create(createCaloteiroDTO);
 
         mv.setViewName("caloteiros/caloteiro-created");
         return mv;
-    }
-
-    @DeleteMapping("/{id}")
-    public String deleteCaloteiroById(@PathVariable Long id) {
-        caloteiroService.deleteById(id);
-        return "redirect:/caloteiros/caloteiro-deleted";
     }
 
     @GetMapping("/{id}/edit")
@@ -64,10 +57,10 @@ public class CaloteiroController {
         ModelAndView mv = new ModelAndView();
 
         try {
-            Caloteiro caloteiroToUpdate = caloteiroService.findById(id);
+            CaloteiroDTO updateCaloteiro = caloteiroService.findById(id);
             mv.setViewName("caloteiros/update-caloteiro");
-            mv.addObject("caloteiro", caloteiroToUpdate);
-        } catch  (CaloteiroException e) {
+            mv.addObject("updateCaloteiro", updateCaloteiro);
+        } catch (CaloteiroException e) {
             mv.setViewName("error/caloteiro-error");
             mv.addObject("errorMessage", e.getMessage());
         }
@@ -76,7 +69,8 @@ public class CaloteiroController {
 
     @PutMapping("/{id}")
     public ModelAndView updateCaloteiro(
-            @Valid @ModelAttribute CaloteiroDTO updateCaloteiro,
+            @PathVariable Long id,
+            @Valid @ModelAttribute UpdateCaloteiroDTO updateCaloteiro,
             BindingResult bindingResult) {
 
         ModelAndView mv = new ModelAndView();
@@ -86,21 +80,25 @@ public class CaloteiroController {
             return mv;
         }
 
-        Caloteiro caloteiro = updateCaloteiro.toCaloteiro();
-        caloteiroService.update(caloteiro);
+        caloteiroService.update(id, updateCaloteiro);
 
         mv.setViewName("redirect:/caloteiros/caloteiro-updated");
         return mv;
     }
 
-    @GetMapping("/caloteiro-deleted")
-    public ModelAndView caloteiroDeleted() {
-        return new ModelAndView("caloteiros/caloteiro-deleted");
+    @DeleteMapping("/{id}")
+    public ModelAndView deleteCaloteiroById(@PathVariable Long id) {
+        caloteiroService.deleteById(id);
+        return new ModelAndView("redirect:/caloteiros/caloteiro-deleted");
     }
-
 
     @GetMapping("/caloteiro-updated")
     public ModelAndView caloteiroUpdated() {
         return new ModelAndView("caloteiros/caloteiro-updated");
+    }
+
+    @GetMapping("/caloteiro-deleted")
+    public ModelAndView caloteiroDeleted() {
+        return new ModelAndView("caloteiros/caloteiro-deleted");
     }
 }

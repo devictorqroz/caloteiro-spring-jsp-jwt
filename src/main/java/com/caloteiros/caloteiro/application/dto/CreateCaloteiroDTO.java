@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CaloteiroMinDTO (
+public record CreateCaloteiroDTO(
 
     @NotBlank(message = "O nome é obrigatório.")
     String name,
@@ -24,7 +24,4 @@ public record CaloteiroMinDTO (
 
     LocalDate debtDate
 ) {
-    public Caloteiro toCaloteiro() {
-        return new Caloteiro(null, this.name, this.email, this.debt, this.debtDate, null);
-    }
 }

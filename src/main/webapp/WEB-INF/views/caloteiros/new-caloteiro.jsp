@@ -29,22 +29,22 @@
 					nameField="name" 
 					label="Nome:" 
 					id="labelName"
-					value="${requestNewCaloteiro.name}" />
+					value="${createCaloteiroDTO.name()}" />
 				<triadTag:textField 
 					nameField="email" 
 					label="Email:" 
 					id="labelEmail"
-					value="${requestNewCaloteiro.email}" />
+					value="${createCaloteiroDTO.email()}" />
 				<triadTag:textField 
 					nameField="debt" 
 					label="Devendo:" 
 					id="labelDebt"
-					value="${requestNewCaloteiro.debt}" />
+					value="${createCaloteiroDTO.debt()}" />
 				<triadTag:textField 
 					nameField="debtDate" 
 					label="Data da Dívida:"
 					id="labelDate"
-					value="${requestNewCaloteiro.debtDate}" />
+					value="${createCaloteiroDTO.debtDate()}" />
 					
 				<input type="submit" value="Cadastrar" />
 			</form>

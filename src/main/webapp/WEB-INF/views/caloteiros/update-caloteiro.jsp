@@ -21,29 +21,29 @@
 			<p>
 				Usuário Logado:
 			</p>
-			<form action="/caloteiros/${caloteiro.id}" method="POST" id="formUpdateCaloteiro">
+			<form action="/caloteiros/${updateCaloteiro.id()}" method="POST" id="formUpdateCaloteiro">
 				<input type="hidden" name="_method" value="PUT"/>
 
 				<triadTag:textField 
 					nameField="name" 
 					label="Nome:" 
 					id="labelName"
-					value="${caloteiro.name}" /> 
+					value="${updateCaloteiro.name()}" />
 				<triadTag:textField 
 					nameField="email" 
 					label="Email:" 
 					id="labelEmail" 
-					value="${caloteiro.email}" /> 
+					value="${updateCaloteiro.email()}" />
 				<triadTag:textField 
 					nameField="debt" 
 					label="Devendo:" 
 					id="labelDebt" 
-					value="${caloteiro.debt}" />
+					value="${updateCaloteiro.debt()}" />
 				<triadTag:textField 
 					nameField="debtDate" 
 					label="Data da Dívida:"
 					id="labelDate" 
-					value="${fn:formatLocalDate(caloteiro.debtDate, 'dd/MM/yyyy')}" />
+					value="${fn:formatLocalDate(updateCaloteiro.debtDate(), 'dd/MM/yyyy')}" />
 
 				<input type="submit" value="Atualizar"/>
 			</form>
