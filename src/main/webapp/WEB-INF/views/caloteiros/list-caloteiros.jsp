@@ -24,7 +24,7 @@
 			</p>		
 			<table>
 				<tr><th>ID</th><th>Nome</th><th>Email</th><th>Devendo</th><th>Data Dívida</th><th>Editar</th><th>Excluir</th></tr>
-				<c:forEach var="caloteiro" items="${caloteiros}" varStatus="id">
+				<c:forEach var="caloteiro" items="${caloteirosPage.caloteiros()}" varStatus="id">
 					<tr>
 						<td>${caloteiro.id()}</td>
 						<c:choose>
@@ -75,6 +75,27 @@
 					</tr>		
 				</c:forEach>
 			</table>
+
+			<div class="pagination">
+                <c:if test="${!caloteirosPage.isFirst()}">
+                    <a href="?pageNumber=0&pageSize=${caloteirosPage.pageSize()}">Primeira</a>
+                </c:if>
+
+                <c:if test="${caloteirosPage.hasPrevious()}">
+                    <a href="?pageNumber=${caloteirosPage.pageNumber() - 1}&pageSize=${caloteirosPage.pageSize()}">Anterior</a>
+                </c:if>
+
+                <span>Página ${caloteirosPage.pageNumber() + 1} de ${caloteirosPage.totalPages()}</span>
+
+                <c:if test="${caloteirosPage.hasNext()}">
+                    <a href="?pageNumber=${caloteirosPage.pageNumber() + 1}&pageSize=${caloteirosPage.pageSize()}">Próxima</a>
+                </c:if>
+
+                <c:if test="${!caloteirosPage.isLast()}">
+                    <a href="?pageNumber=${caloteirosPage.totalPages() - 1}&pageSize=${caloteirosPage.pageSize()}">Última</a>
+                </c:if>
+            </div>
+
 			<a href="/menu" class="menu-link">Retornar ao Menu</a>
 		</main>
 		<footer>

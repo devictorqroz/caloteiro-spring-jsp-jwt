@@ -1,12 +1,17 @@
 package com.caloteiros.caloteiro.interfaces.controllers;
 
+import com.caloteiros.caloteiro.application.dto.CaloteiroPageDTO;
 import com.caloteiros.caloteiro.application.dto.UpdateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CreateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CaloteiroDTO;
 import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.caloteiro.domain.services.CaloteiroService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +27,13 @@ public class CaloteiroController {
     CaloteiroService caloteiroService;
 
     @GetMapping
-    public ModelAndView findAll() {
-        List<CaloteiroDTO> caloteiros = caloteiroService.list();
+    public ModelAndView findAll(
+            @RequestParam(defaultValue = "0") @PositiveOrZero int pageNumber,
+            @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize) {
+
+        CaloteiroPageDTO caloteirosPage = caloteiroService.list(pageNumber, pageSize);
         ModelAndView mv = new ModelAndView("caloteiros/list-caloteiros");
-        mv.addObject("caloteiros", caloteiros);
+        mv.addObject("caloteirosPage", caloteirosPage);
         return mv;
     }
 

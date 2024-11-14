@@ -78,6 +78,34 @@ table a:hover {
     text-decoration: underline;
 }
 
+.pagination {
+    margin-top: 20px; /* Espaço entre a tabela e a navegação */
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo */
+    gap: 10px; /* Espaço entre os links */
+    font-size: 1em;
+}
+
+.pagination a {
+    color: #333;
+    text-decoration: none;
+    padding: 5px 10px;
+    background-color: #e9ecef;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #555;
+    color: #fff;
+}
+
+.pagination span {
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
 main a.menu-link {
     display: inline-block;
     margin-top: 20px;
