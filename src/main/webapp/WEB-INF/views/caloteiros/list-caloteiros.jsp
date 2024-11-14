@@ -21,7 +21,22 @@
 			</p>
 			<p>
 				Lista de Caloteiros: 
-			</p>		
+			</p>
+            <div class="sorting-container">
+                <form method="get" action="">
+                    <label for="sortField">Ordenar por:</label>
+                    <select name="sortField" id="sortField" onchange="this.form.submit()">
+                        <option value="name" ${param.sortField == 'name' ? 'selected' : ''}>Nome</option>
+                        <option value="debt" ${param.sortField == 'debt' ? 'selected' : ''}>Dívida</option>
+                        <option value="debtDate" ${param.sortField == 'debtDate' ? 'selected' : ''}>Data</option>
+                    </select>
+
+                    <select name="sortOrder" id="sortOrder" onchange="this.form.submit()">
+                        <option value="asc" ${param.sortOrder == 'asc' ? 'selected' : ''}>Crescente</option>
+                        <option value="desc" ${param.sortOrder == 'desc' ? 'selected' : ''}>Decrescente</option>
+                    </select>
+                </form>
+            </div>
 			<table>
 				<tr><th>ID</th><th>Nome</th><th>Email</th><th>Devendo</th><th>Data Dívida</th><th>Editar</th><th>Excluir</th></tr>
 				<c:forEach var="caloteiro" items="${caloteirosPage.caloteiros()}" varStatus="id">
@@ -75,7 +90,6 @@
 					</tr>		
 				</c:forEach>
 			</table>
-
 			<div class="pagination">
                 <c:if test="${!caloteirosPage.isFirst()}">
                     <a href="?pageNumber=0&pageSize=${caloteirosPage.pageSize()}">Primeira</a>
@@ -95,7 +109,6 @@
                     <a href="?pageNumber=${caloteirosPage.totalPages() - 1}&pageSize=${caloteirosPage.pageSize()}">Última</a>
                 </c:if>
             </div>
-
 			<a href="/menu" class="menu-link">Retornar ao Menu</a>
 		</main>
 		<footer>

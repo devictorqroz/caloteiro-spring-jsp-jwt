@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,9 +31,33 @@ public class CaloteiroService {
         this.caloteiroMapper = caloteiroMapper;
     }
 
-    public CaloteiroPageDTO list(@PositiveOrZero int pageNumber, @Positive @Max(100) int pageSize) {
-        Page<Caloteiro> page = caloteiroRepository.findAll(PageRequest.of(pageNumber, pageSize));
-        List<CaloteiroDTO> caloteiros = page.get().map(caloteiroMapper::toCaloteiroDTO).toList();
+    public CaloteiroPageDTO list(
+            @PositiveOrZero int pageNumber,
+            @Positive @Max(100) int pageSize,
+            String sortField,
+            String sortOrder) {
+
+        Sort sort = Sort.by("name").ascending();
+
+        if (sortField.equalsIgnoreCase("debt")) {
+            sort = Sort.by("debt");
+        } else if (sortField.equalsIgnoreCase("debtDate")) {
+            sort = Sort.by("debtDate");
+        }
+
+        if (sortOrder.equalsIgnoreCase("desc")) {
+            sort = sort.descending();
+        } else {
+            sort = sort.ascending();
+        }
+
+        Page<Caloteiro> page =
+            caloteiroRepository.findAll(PageRequest.of(pageNumber, pageSize, sort));
+
+        List<CaloteiroDTO> caloteiros =
+                page.get()
+                    .map(caloteiroMapper::toCaloteiroDTO)
+                    .toList();
 
         return new CaloteiroPageDTO(
             caloteiros,

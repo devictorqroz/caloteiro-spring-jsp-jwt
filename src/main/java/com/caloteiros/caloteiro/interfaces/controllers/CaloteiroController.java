@@ -29,11 +29,15 @@ public class CaloteiroController {
     @GetMapping
     public ModelAndView findAll(
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNumber,
-            @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize) {
+            @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize,
+            @RequestParam(defaultValue = "name") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
 
-        CaloteiroPageDTO caloteirosPage = caloteiroService.list(pageNumber, pageSize);
+        CaloteiroPageDTO caloteirosPage = caloteiroService.list(pageNumber, pageSize, sortField, sortOrder);
         ModelAndView mv = new ModelAndView("caloteiros/list-caloteiros");
         mv.addObject("caloteirosPage", caloteirosPage);
+        mv.addObject("sortField", sortField);
+        mv.addObject("sortOrder", sortOrder);
         return mv;
     }
 

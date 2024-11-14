@@ -33,6 +33,48 @@ main p {
     margin: 20px 0;
 }
 
+.sorting-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sorting-container form {
+    display: flex;
+    align-items: center;
+}
+
+.sorting-container label {
+    margin-right: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.sorting-container select {
+    padding: 8px 15px;
+    margin-left: 10px;
+    font-size: 1em;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sorting-container select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.sorting-container select:hover {
+    border-color: #007bff;
+}
+
 table {
     width: 100%; 
     border-collapse: collapse; 
@@ -79,10 +121,10 @@ table a:hover {
 }
 
 .pagination {
-    margin-top: 20px; /* Espaço entre a tabela e a navegação */
+    margin-top: 20px;
     display: flex;
-    justify-content: center; /* Centraliza o conteúdo */
-    gap: 10px; /* Espaço entre os links */
+    justify-content: center;
+    gap: 10px;
     font-size: 1em;
 }
 
