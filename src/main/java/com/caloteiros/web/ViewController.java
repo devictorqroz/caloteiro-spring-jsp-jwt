@@ -7,8 +7,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class ViewController {
 
-    @GetMapping("/menu")
-    public ModelAndView menu() {
-        return new ModelAndView("menu");
+    @GetMapping(value = {"/", "/home"})
+    public ModelAndView home() {
+        return new ModelAndView("home");
     }
 }

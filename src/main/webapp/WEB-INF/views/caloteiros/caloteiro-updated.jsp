@@ -16,7 +16,7 @@
     <main>
         <h3>Sucesso</h3>
         <p>Caloteiro atualizado com sucesso.</p>
-        <a href="/menu">Retornar ao Menu</a>
+        <a href="/home">Retornar ao Menu</a>
     </main>
     <footer>
        <c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />

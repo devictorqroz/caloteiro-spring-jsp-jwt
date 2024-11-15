@@ -48,14 +48,15 @@ form input[type="password"] {
 }
 
 form input[type="submit"] {
-    width: 100%;
+    width: 180px;
     padding: 10px;
     background-color: #333;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-     margin-top: 15px;
+    margin-top: 15px;
+    transition: background-color 0.3s;
 }
 
 form input[type="submit"]:hover {
@@ -64,12 +65,14 @@ form input[type="submit"]:hover {
 
 main a.menu-link {
     display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
+    width: 180px;
+    padding: 10px;
     background-color: #333;
     color: #fff;
     text-decoration: none;
     border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
 }
 
 main a.menu-link:hover {
@@ -86,4 +89,15 @@ footer {
     bottom: 0;
     left: 0;
     z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    form input[type="submit"],
+    main a.menu-link {
+        width: 100%;
+    }
+
+    main {
+        padding: 10px;
+    }
 }

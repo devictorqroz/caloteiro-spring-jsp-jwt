@@ -17,7 +17,7 @@
     <main>
         <h1>${error}</h1>
         <p>${message}</p>
-        <a href="/menu">Retornar ao Menu</a>
+        <a href="/home">Retornar ao Menu</a>
     </main>
     <footer>
        <c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />

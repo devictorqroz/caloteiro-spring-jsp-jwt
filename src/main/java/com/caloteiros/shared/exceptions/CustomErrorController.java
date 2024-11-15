@@ -28,7 +28,7 @@ public class CustomErrorController implements ErrorController {
                 mv.addObject("error", "404");
                 mv.addObject("message", "Página não encontrada.");
             } else {
-                mv.setViewName("error/500");
+                mv.setViewName("error/default-error");
                 mv.addObject("error", "500");
                 mv.addObject("message", "Erro interno do servidor.");
             }

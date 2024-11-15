@@ -11,10 +11,8 @@ import com.caloteiros.caloteiro.domain.repositories.CaloteiroRepository;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -83,8 +81,9 @@ public class CaloteiroService {
         caloteiroRepository.save(caloteiro);
     }
 
-    public void deleteById(Long id) {
-        caloteiroRepository.deleteById(id);
+    public void delete(Long id) {
+        caloteiroRepository.delete(caloteiroRepository.findById(id)
+                .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id)));
     }
 
     public void update(Long id, UpdateCaloteiroDTO updateCaloteiro) {

@@ -11,20 +11,20 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/caloteiros")
 public class CaloteiroController {
 
-    @Autowired
-    CaloteiroService caloteiroService;
+    private final CaloteiroService caloteiroService;
+
+    public CaloteiroController(CaloteiroService caloteiroService) {
+        this.caloteiroService = caloteiroService;
+    }
 
     @GetMapping
     public ModelAndView findAll(
@@ -68,14 +68,10 @@ public class CaloteiroController {
     public ModelAndView displayUpdateCaloteiroForm(@PathVariable Long id) {
         ModelAndView mv = new ModelAndView();
 
-        try {
-            CaloteiroDTO updateCaloteiro = caloteiroService.findById(id);
-            mv.setViewName("caloteiros/update-caloteiro");
-            mv.addObject("updateCaloteiro", updateCaloteiro);
-        } catch (CaloteiroException e) {
-            mv.setViewName("error/caloteiro-error");
-            mv.addObject("errorMessage", e.getMessage());
-        }
+        CaloteiroDTO updateCaloteiro = caloteiroService.findById(id);
+        mv.setViewName("caloteiros/update-caloteiro");
+        mv.addObject("updateCaloteiro", updateCaloteiro);
+
         return mv;
     }
 
@@ -100,7 +96,7 @@ public class CaloteiroController {
 
     @DeleteMapping("/{id}")
     public ModelAndView deleteCaloteiroById(@PathVariable Long id) {
-        caloteiroService.deleteById(id);
+        caloteiroService.delete(id);
         return new ModelAndView("redirect:/caloteiros/caloteiro-deleted");
     }
 

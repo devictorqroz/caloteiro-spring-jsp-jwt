@@ -83,9 +83,10 @@ public class AuthController {
         String token = this.tokenService.generateToken(user);
 
         session.setAttribute("JWT_TOKEN", token);
+        session.setAttribute("loggedUserId", user.getId());
         session.setAttribute("loggedUserName", user.getName());
 
-        return "menu";
+        return "home";
     }
 
     @PostMapping("/register")

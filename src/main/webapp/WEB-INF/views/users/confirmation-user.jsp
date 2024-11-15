@@ -4,19 +4,18 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erro de Usuário</title>
+    <title>Usuário Adicionado</title>
     <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/error.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/action-completed.css">
 </head>
 <body>
 	<header>
 		<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/header.jsp" />
-		<h2>Caloteiros</h2>
+		<h1>Caloteiros</h1>
 	</header>
     <main>
-        <h1>${error}</h1>
-        <p>${message}</p>
+        <h3>Sucesso</h3>
+        <p>Operação realizada com sucesso.</p>
         <a href="/home">Retornar ao Menu</a>
     </main>
     <footer>

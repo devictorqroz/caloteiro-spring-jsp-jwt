@@ -1,0 +1,92 @@
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+main {
+    margin-top: 70px;
+    margin-bottom: 50px;
+    padding: 20px;
+    text-align: center;
+}
+
+.welcome-section {
+    font-size: 18px;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.welcome-section p {
+    margin: 5px 0;
+}
+
+.action-menu ol {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.action-menu ol li {
+    margin-bottom: 20px;
+}
+
+.action-menu ol li a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    width: 180px;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.action-menu ol li a:hover {
+    background-color: #555;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .action-menu ol li a {
+        width: 100%;
+        padding: 10px;
+    }
+
+    header, footer {
+        padding: 8px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .welcome-section {
+        font-size: 16px;
+    }
+}

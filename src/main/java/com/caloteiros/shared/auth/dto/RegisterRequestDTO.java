@@ -13,6 +13,6 @@ public record RegisterRequestDTO(
     String password
 ) {
     public User toUser() {
-        return new User(this.name, this.email, this.password);
+        return new User(null, this.name, this.email, this.password);
     }
 }

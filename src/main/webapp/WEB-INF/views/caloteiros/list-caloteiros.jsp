@@ -109,7 +109,7 @@
                     <a href="?pageNumber=${caloteirosPage.totalPages() - 1}&pageSize=${caloteirosPage.pageSize()}">Última</a>
                 </c:if>
             </div>
-			<a href="/menu" class="menu-link">Retornar ao Menu</a>
+			<a href="/home" class="menu-link">Retornar ao Menu</a>
 		</main>
 		<footer>
 			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />
