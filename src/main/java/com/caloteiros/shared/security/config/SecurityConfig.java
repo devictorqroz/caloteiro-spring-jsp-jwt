@@ -41,7 +41,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
                         .requestMatchers("/auth/**","/login", "/auth/login", "/register", "/auth/register").permitAll()
-                        .requestMatchers("/css/**", "/favicon", "/images/**", "/javascript/**", "/WEB-INF/tags/**", "/tags/**", "/WEB-INF/**","/views/includes/**", "/views/auth/**").permitAll()
+                        .requestMatchers("/password/**", "/password/forgot", "/password/reset").permitAll()
+                        .requestMatchers("/css/**", "/favicon", "/images/**", "/javascript/**", "/WEB-INF/tags/**", "/tags/**", "/WEB-INF/**","/views/includes/**", "/views/auth/**", "/views/users/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

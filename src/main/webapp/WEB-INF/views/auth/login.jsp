@@ -43,6 +43,7 @@
 				<input type="submit" value="Login" />
 			</form>
 			<div class="links-below-form">
+                <a href="/password/forgot" id="link-new-user">Esqueceu sua senha?</a>
                 <a href="/auth/register" id="link-new-user">Não tem uma conta? Cadastre-se</a>
             </div>
 		</main>

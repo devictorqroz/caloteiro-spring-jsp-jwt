@@ -2,6 +2,7 @@ package com.caloteiros.shared.exceptions;
 
 import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.user.domain.exceptions.PasswordException;
+import com.caloteiros.user.domain.exceptions.PasswordResetTokenException;
 import com.caloteiros.user.domain.exceptions.UserException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -74,6 +75,12 @@ public class ApplicationExceptionHandler {
     public ModelAndView handlePasswordException(PasswordException ex) {
         return createErrorModelAndView("error/user-error",
                 "Erro na operação com Usuário", ex.getMessage());
+    }
+
+    @ExceptionHandler(PasswordResetTokenException.class)
+    public ModelAndView handleTokenPasswordException(PasswordResetTokenException ex) {
+        return createErrorModelAndView("error/user-error",
+                "Erro com Token de recuperação de password", ex.getMessage());
     }
 
     private ModelAndView createErrorModelAndView(String viewName, String error, String message) {
