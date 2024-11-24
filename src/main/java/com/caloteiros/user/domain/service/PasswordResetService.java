@@ -9,6 +9,7 @@ import com.caloteiros.user.domain.repositories.PasswordResetTokenRepository;
 import com.caloteiros.user.domain.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class PasswordResetService {
         this.emailService = emailService;
     }
 
+    @Transactional
     public String generateResetToken(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException("Usuário não encontrado com o Email: " + email));
@@ -41,6 +43,7 @@ public class PasswordResetService {
         return token.getToken();
     }
 
+    @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new PasswordResetTokenException("Token inválido"));

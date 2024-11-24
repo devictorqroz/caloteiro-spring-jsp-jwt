@@ -17,7 +17,7 @@
 		</header>
 		<main>
 			<p>
-				Usuário Logado:
+				Usuário Logado: ${sessionScope.loggedUserName}
 			</p>
 			<p>
 				Lista de Caloteiros: 
@@ -38,10 +38,9 @@
                 </form>
             </div>
 			<table>
-				<tr><th>ID</th><th>Nome</th><th>Email</th><th>Devendo</th><th>Data Dívida</th><th>Editar</th><th>Excluir</th></tr>
+				<tr><th>Nome</th><th>Email</th><th>Devendo</th><th>Data Dívida</th><th>Editar</th><th>Excluir</th></tr>
 				<c:forEach var="caloteiro" items="${caloteirosPage.caloteiros()}" varStatus="id">
 					<tr>
-						<td>${caloteiro.id()}</td>
 						<c:choose>
 							<c:when test="${not empty caloteiro.name()}">
 								<td>${caloteiro.name()}</td>

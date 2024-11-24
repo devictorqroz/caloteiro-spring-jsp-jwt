@@ -34,4 +34,3 @@ public class CachedUserDetailsService implements UserDetailsService {
         return user;
     }
 }
-

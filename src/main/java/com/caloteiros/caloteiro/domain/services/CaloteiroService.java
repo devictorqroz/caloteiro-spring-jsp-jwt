@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -73,6 +74,7 @@ public class CaloteiroService {
         );
     }
 
+    @Cacheable(value = "caloteiros", key = "#id")
     public CaloteiroDTO findById(Long id) {
         return caloteiroRepository.findById(id)
                 .map(caloteiroMapper::toCaloteiroDTO)
@@ -80,18 +82,21 @@ public class CaloteiroService {
     }
 
     @CacheEvict(value = "caloteiros", allEntries = true)
+    @Transactional
     public void create(CreateCaloteiroDTO createCaloteiroDTO) {
         Caloteiro caloteiro = caloteiroMapper.fromCreateDTOToEntity(createCaloteiroDTO);
         caloteiroRepository.save(caloteiro);
     }
 
-    @CacheEvict(value = "caloteiros", allEntries = true)
+    @CacheEvict(value = "caloteiros", key = "#id")
+    @Transactional
     public void delete(Long id) {
         caloteiroRepository.delete(caloteiroRepository.findById(id)
                 .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id)));
     }
 
-    @CacheEvict(value = "caloteiros", allEntries = true)
+    @CacheEvict(value = "caloteiros", key = "#id")
+    @Transactional
     public void update(Long id, UpdateCaloteiroDTO updateCaloteiro) {
         Caloteiro caloteiro = caloteiroRepository.findById(id)
                 .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id));
