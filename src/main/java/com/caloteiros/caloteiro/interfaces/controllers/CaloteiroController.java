@@ -4,13 +4,14 @@ import com.caloteiros.caloteiro.application.dto.CaloteiroPageDTO;
 import com.caloteiros.caloteiro.application.dto.UpdateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CreateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CaloteiroDTO;
-import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.caloteiro.domain.services.CaloteiroService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +32,29 @@ public class CaloteiroController {
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNumber,
             @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize,
             @RequestParam(defaultValue = "name") String sortField,
-            @RequestParam(defaultValue = "asc") String sortOrder) {
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String name) {
 
-        CaloteiroPageDTO caloteirosPage = caloteiroService.list(pageNumber, pageSize, sortField, sortOrder);
         ModelAndView mv = new ModelAndView("caloteiros/list-caloteiros");
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortField).ascending());
+
+        if (sortOrder.equalsIgnoreCase("desc")) {
+            pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortField).descending());
+        }
+
+        CaloteiroPageDTO caloteirosPage;
+
+        if (name == null || name.isBlank()) {
+            caloteirosPage = caloteiroService.list(pageNumber, pageSize, sortField, sortOrder);
+        } else {
+            caloteirosPage = caloteiroService.searchByName(name, pageable);
+        }
+
         mv.addObject("caloteirosPage", caloteirosPage);
         mv.addObject("sortField", sortField);
         mv.addObject("sortOrder", sortOrder);
+        mv.addObject("searchQuery", name);
         return mv;
     }
 

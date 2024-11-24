@@ -1,6 +1,5 @@
 package com.caloteiros.user.domain.service;
 
-import com.caloteiros.shared.security.service.CachedUserDetailsService;
 import com.caloteiros.user.application.dto.UpdateUserDTO;
 import com.caloteiros.user.application.dto.UserDTO;
 import com.caloteiros.user.application.mapper.UserMapper;
@@ -20,13 +19,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final CachedUserDetailsService cachedUserDetailsService;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, CachedUserDetailsService cachedUserDetailsService) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-        this.cachedUserDetailsService = cachedUserDetailsService;
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -63,8 +60,6 @@ public class UserService {
             String hash = passwordEncoder.encode(updateUserDTO.newPassword());
             user.setPassword(hash);
             userRepository.save(user);
-
-            cachedUserDetailsService.invalidateCache(user.getEmail());
         }
     }
 }

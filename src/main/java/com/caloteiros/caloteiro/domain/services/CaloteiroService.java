@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,17 +62,7 @@ public class CaloteiroService {
                     .map(caloteiroMapper::toCaloteiroDTO)
                     .toList();
 
-        return new CaloteiroPageDTO(
-            caloteiros,
-            page.getNumber(),
-            page.getSize(),
-            page.getTotalElements(),
-            page.getTotalPages(),
-            page.hasPrevious(),
-            page.hasNext(),
-            page.isFirst(),
-            page.isLast()
-        );
+         return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
     }
 
     @Cacheable(value = "caloteiros", key = "#id")
@@ -79,6 +70,17 @@ public class CaloteiroService {
         return caloteiroRepository.findById(id)
                 .map(caloteiroMapper::toCaloteiroDTO)
                 .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id));
+    }
+
+    public CaloteiroPageDTO searchByName(String name, Pageable pageable) {
+        Page<Caloteiro> page = caloteiroRepository.findByNameContainingIgnoreCase(name, pageable);
+
+        List<CaloteiroDTO> caloteiros = page.getContent()
+                .stream()
+                .map(caloteiroMapper::toCaloteiroDTO)
+                .toList();
+
+        return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
     }
 
     @CacheEvict(value = "caloteiros", allEntries = true)

@@ -19,11 +19,8 @@
 			<p>
 				Usuário Logado: ${sessionScope.loggedUserName}
 			</p>
-			<p>
-				Lista de Caloteiros: 
-			</p>
             <div class="sorting-container">
-                <form method="get" action="">
+                <form method="GET" action="">
                     <label for="sortField">Ordenar por:</label>
                     <select name="sortField" id="sortField" onchange="this.form.submit()">
                         <option value="name" ${param.sortField == 'name' ? 'selected' : ''}>Nome</option>
@@ -37,73 +34,78 @@
                     </select>
                 </form>
             </div>
+
+            <div class="search-container">
+                <form action="/caloteiros" method="GET">
+                    <label for="searchName">Pesquisar por Nome:</label>
+                    <input type="text" id="searchName" name="name" value="${param.name}">
+                    <button type="submit">Pesquisar</button>
+                </form>
+
+                <form action="/caloteiros" method="GET">
+                    <input type="hidden" name="pageNumber" value="0">
+                    <input type="hidden" name="pageSize" value="10">
+                    <button type="submit">Limpar</button>
+                </form>
+            </div>
+
 			<table>
-				<tr><th>Nome</th><th>Email</th><th>Devendo</th><th>Data Dívida</th><th>Editar</th><th>Excluir</th></tr>
-				<c:forEach var="caloteiro" items="${caloteirosPage.caloteiros()}" varStatus="id">
-					<tr>
-						<c:choose>
-							<c:when test="${not empty caloteiro.name()}">
-								<td>${caloteiro.name()}</td>
-							</c:when>
-							<c:otherwise>
-								<td>Nome não preenchido.</td>
-							</c:otherwise>
-						</c:choose>
-						<c:choose>
-							<c:when test="${not empty caloteiro.email()}">
-								<td><a href="#">${caloteiro.email()}</a></td>
-							</c:when>
-							<c:otherwise>
-								<td>E-mail não preenchido.</td>
-							</c:otherwise>
-						</c:choose>
-						<c:choose>
-							<c:when test="${not empty caloteiro.debt()}">
-								<td>${caloteiro.debt()}</td>
-							</c:when>
-							<c:otherwise>
-								<td>Devendo não preenchido.</td>
-							</c:otherwise>
-						</c:choose>
-						<c:choose>
-							<c:when test="${not empty caloteiro.debtDate()}">
-								<td>
-									 ${fn:formatLocalDate(caloteiro.debtDate(), 'dd/MM/yyyy')}
-								</td>
-							</c:when>
-							<c:otherwise>
-								<td>Data dívida não preenchida.</td>
-							</c:otherwise>
-						</c:choose>
-						<td>
-							<form action="/caloteiros/${caloteiro.id()}/edit" method="GET">
-								<input type="submit" id="updateButton" value="Editar" />
-							</form>
-						</td>
-						<td>
-							<form action="/caloteiros/${caloteiro.id()}" method="POST">
-								<input type="hidden" name="_method" value="DELETE" />
-								<input type="submit" id="deleteButton" value="Excluir" />
-							</form>
-						</td>
-					</tr>		
-				</c:forEach>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Devendo</th>
+                        <th>Data Dívida</th>
+                        <th>Editar</th>
+                        <th>Excluir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:if test="${empty caloteirosPage.caloteiros()}">
+                        <tr>
+                            <td colspan="6">Nenhum registro encontrado.</td>
+                        </tr>
+                    </c:if>
+                    <c:forEach var="caloteiro" items="${caloteirosPage.caloteiros()}">
+                        <tr>
+                            <td>${caloteiro.name() != null ? caloteiro.name() : "Nome não preenchido."}</td>
+                            <td>${caloteiro.email() != null ? caloteiro.email() : "E-mail não preenchido."}</td>
+                            <td>${caloteiro.debt() != null ? caloteiro.debt() : "Devendo não preenchido."}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${not empty caloteiro.debtDate()}">
+                                        ${fn:formatLocalDate(caloteiro.debtDate(), 'dd/MM/yyyy')}
+                                    </c:when>
+                                    <c:otherwise>Data dívida não preenchida.</c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <form action="/caloteiros/${caloteiro.id()}/edit" method="GET">
+                                    <input type="submit" id="updateButton" value="Editar" />
+                                </form>
+                            </td>
+                            <td>
+                                <form action="/caloteiros/${caloteiro.id()}" method="POST">
+                                    <input type="hidden" name="_method" value="DELETE" />
+                                    <input type="submit" id="deleteButton" value="Excluir" />
+                                </form>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
 			</table>
+
 			<div class="pagination">
                 <c:if test="${!caloteirosPage.isFirst()}">
                     <a href="?pageNumber=0&pageSize=${caloteirosPage.pageSize()}">Primeira</a>
                 </c:if>
-
                 <c:if test="${caloteirosPage.hasPrevious()}">
                     <a href="?pageNumber=${caloteirosPage.pageNumber() - 1}&pageSize=${caloteirosPage.pageSize()}">Anterior</a>
                 </c:if>
-
                 <span>Página ${caloteirosPage.pageNumber() + 1} de ${caloteirosPage.totalPages()}</span>
-
                 <c:if test="${caloteirosPage.hasNext()}">
                     <a href="?pageNumber=${caloteirosPage.pageNumber() + 1}&pageSize=${caloteirosPage.pageSize()}">Próxima</a>
                 </c:if>
-
                 <c:if test="${!caloteirosPage.isLast()}">
                     <a href="?pageNumber=${caloteirosPage.totalPages() - 1}&pageSize=${caloteirosPage.pageSize()}">Última</a>
                 </c:if>
