@@ -11,6 +11,8 @@ import com.caloteiros.caloteiro.domain.repositories.CaloteiroRepository;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,6 +31,7 @@ public class CaloteiroService {
         this.caloteiroMapper = caloteiroMapper;
     }
 
+    @Cacheable(value = "caloteiros", key = "#pageNumber + '_' + #pageSize + '_' + #sortField + '_' + #sortOrder")
     public CaloteiroPageDTO list(
             @PositiveOrZero int pageNumber,
             @Positive @Max(100) int pageSize,
@@ -76,16 +79,19 @@ public class CaloteiroService {
                 .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id));
     }
 
+    @CacheEvict(value = "caloteiros", allEntries = true)
     public void create(CreateCaloteiroDTO createCaloteiroDTO) {
         Caloteiro caloteiro = caloteiroMapper.fromCreateDTOToEntity(createCaloteiroDTO);
         caloteiroRepository.save(caloteiro);
     }
 
+    @CacheEvict(value = "caloteiros", allEntries = true)
     public void delete(Long id) {
         caloteiroRepository.delete(caloteiroRepository.findById(id)
                 .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id)));
     }
 
+    @CacheEvict(value = "caloteiros", allEntries = true)
     public void update(Long id, UpdateCaloteiroDTO updateCaloteiro) {
         Caloteiro caloteiro = caloteiroRepository.findById(id)
                 .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id));
