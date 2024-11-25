@@ -1,9 +1,7 @@
 package com.caloteiros.caloteiro.domain.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.caloteiros.user.domain.entities.User;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,22 +12,26 @@ public class Caloteiro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String email;
     private BigDecimal debt;
     private LocalDate debtDate;
-    private Long userId;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public Caloteiro() {
     }
 
-    public Caloteiro(Long id, String name, String email, BigDecimal debt, LocalDate debtDate, Long userId) {
+    public Caloteiro(Long id, String name, String email, BigDecimal debt, LocalDate debtDate, User user) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.debt = debt;
         this.debtDate = debtDate;
-        this.userId = userId;
+        this.user = user;
     }
 
     public Long getId() {
@@ -72,12 +74,12 @@ public class Caloteiro {
         this.debtDate = debtDate;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class Caloteiro {
                 ", email='" + email + '\'' +
                 ", debt=" + debt +
                 ", debtDate=" + debtDate +
-                ", userId=" + userId +
+                ", user=" + user +
                 '}';
     }
 }

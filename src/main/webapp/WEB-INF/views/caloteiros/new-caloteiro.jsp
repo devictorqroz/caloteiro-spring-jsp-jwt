@@ -20,7 +20,7 @@
 		</header>
 		<main>
 			<p>
-				Usuário Logado: ${currentUser.username}
+				Usuário Logado: ${sessionScope.loggedUserName}
 			</p>
 
 			<form action="${pageContext.request.contextPath}/caloteiros" method="POST" id="formNewCaloteiro">

@@ -7,6 +7,7 @@ import com.caloteiros.user.domain.entities.User;
 import com.caloteiros.user.domain.exceptions.UserException;
 import com.caloteiros.user.domain.repositories.UserRepository;
 import com.caloteiros.user.domain.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,7 @@ public class AuthController {
 
         session.setAttribute("JWT_TOKEN", token);
         session.setAttribute("loggedUserId", user.getId());
-        session.setAttribute("loggedUserName", user.getName());
+        session.setAttribute("loggedUserName", user.getUsername());
 
         return "home";
     }
@@ -119,8 +120,8 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout(HttpServletRequest request) {
+        request.getSession().invalidate();
         return "redirect:/auth/login";
     }
 }

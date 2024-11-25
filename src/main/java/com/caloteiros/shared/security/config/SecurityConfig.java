@@ -2,7 +2,6 @@ package com.caloteiros.shared.security.config;
 
 import com.caloteiros.shared.security.filter.SecurityFilter;
 import com.caloteiros.shared.security.service.CachedUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,11 +23,15 @@ import static jakarta.servlet.DispatcherType.FORWARD;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    CachedUserDetailsService cachedUserDetailsService;
+    private final CachedUserDetailsService cachedUserDetailsService;
+    private final SecurityFilter securityFilter;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-    @Autowired
-    SecurityFilter securityFilter;
+    public SecurityConfig(CachedUserDetailsService cachedUserDetailsService, SecurityFilter securityFilter, CustomLogoutSuccessHandler customLogoutSuccessHandler) {
+        this.cachedUserDetailsService = cachedUserDetailsService;
+        this.securityFilter = securityFilter;
+        this.customLogoutSuccessHandler = customLogoutSuccessHandler;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,7 +51,7 @@ public class SecurityConfig {
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout()
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessUrl("/auth/login")
+                    .logoutSuccessHandler(customLogoutSuccessHandler)
                     .permitAll()
                 .and()
                 .exceptionHandling()

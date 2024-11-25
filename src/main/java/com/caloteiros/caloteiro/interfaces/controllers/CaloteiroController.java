@@ -46,7 +46,7 @@ public class CaloteiroController {
         CaloteiroPageDTO caloteirosPage;
 
         if (name == null || name.isBlank()) {
-            caloteirosPage = caloteiroService.list(pageNumber, pageSize, sortField, sortOrder);
+            caloteirosPage = caloteiroService.listByUser(pageNumber, pageSize, sortField, sortOrder);
         } else {
             caloteirosPage = caloteiroService.searchByName(name, pageable);
         }

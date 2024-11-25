@@ -83,6 +83,12 @@ public class ApplicationExceptionHandler {
                 "Erro com Token de recuperação de password", ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ModelAndView handleIllegalArgumentException(IllegalArgumentException ex) {
+        return createErrorModelAndView("error/default-error",
+                "Erro com os campos de orndeção da listagem", ex.getMessage());
+    }
+
     private ModelAndView createErrorModelAndView(String viewName, String error, String message) {
         ModelAndView mv = new ModelAndView(viewName);
         mv.addObject("error", error);
