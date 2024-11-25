@@ -87,7 +87,7 @@
                             <td>
                                 <form action="/caloteiros/${caloteiro.id()}" method="POST">
                                     <input type="hidden" name="_method" value="DELETE" />
-                                    <input type="submit" id="deleteButton" value="Excluir" />
+                                    <input type="submit" id="deleteCaloteiroButton" value="Excluir" />
                                 </form>
                             </td>
                         </tr>

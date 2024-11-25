@@ -36,6 +36,9 @@
                     <li>
                         <a href='<c:url value="/logout" />'>Logout</a>
                     </li>
+                    <li>
+                        <a href='<c:url value="/users/delete" />'>Excluir conta</a>
+                    </li>
                 </ol>
             </section>
         </main>

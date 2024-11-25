@@ -1,5 +1,6 @@
 package com.caloteiros.user.domain.service;
 
+import com.caloteiros.user.application.dto.DeleteUserDTO;
 import com.caloteiros.user.application.dto.UpdateUserDTO;
 import com.caloteiros.user.application.dto.UserDTO;
 import com.caloteiros.user.application.mapper.UserMapper;
@@ -61,5 +62,22 @@ public class UserService {
             user.setPassword(hash);
             userRepository.save(user);
         }
+    }
+
+    @CacheEvict(value = "users", allEntries = true)
+    public void delete(Long userId, DeleteUserDTO deleteUserDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("Usuário não encontrado com o ID: " + userId));
+
+        if (!passwordEncoder.matches(deleteUserDTO.password(), user.getPassword())) {
+            throw new UserException("Password inválido!");
+        }
+
+        userRepository.delete(user);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException("Usuário não encontrado com o username: " + username));
     }
 }

@@ -1,6 +1,5 @@
 package com.caloteiros.caloteiro.application.dto;
 
-import com.caloteiros.caloteiro.domain.entities.Caloteiro;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

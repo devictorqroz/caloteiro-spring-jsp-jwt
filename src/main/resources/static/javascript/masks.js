@@ -114,5 +114,20 @@ $(document).ready(function() {
             }
         }
     });
+
+    $('#deleteUserForm').validate({
+            rules: {
+                password: {
+                    required: true,
+                    minlength: 6
+                }
+            },
+            messages: {
+                password: {
+                    required: "Esse campo é obrigatório!",
+                    minlength: "O campo password não pode ter menos que 6 caracteres"
+                }
+            }
+        });
 });
 
