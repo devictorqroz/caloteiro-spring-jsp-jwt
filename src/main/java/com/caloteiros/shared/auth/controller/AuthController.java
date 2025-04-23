@@ -84,6 +84,7 @@ public class AuthController {
         String token = this.tokenService.generateToken(user);
 
         session.setAttribute("JWT_TOKEN", token);
+        session.setAttribute("AUTHENTICATED_USER", user);
         session.setAttribute("loggedUserId", user.getId());
         session.setAttribute("loggedUserName", user.getUsername());
 
@@ -116,6 +117,7 @@ public class AuthController {
 
         String token = this.tokenService.generateToken(user);
         session.setAttribute("JWT_TOKEN", token);
+        session.setAttribute("AUTHENTICATED_USER", user);
         return "redirect:/auth/login";
     }
 
