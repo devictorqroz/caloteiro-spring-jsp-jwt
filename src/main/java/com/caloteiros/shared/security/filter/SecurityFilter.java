@@ -79,28 +79,3 @@ public class SecurityFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-
-
-//HttpSession session = request.getSession(false);
-//String token = (session != null) ? (String) session.getAttribute("JWT_TOKEN") : null;
-
-
-//        if (token != null) {
-//            var login = tokenService.validateToken(token);
-//            if (login != null) {
-//                User user = userRepository.findByEmail(login)
-//                        .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//                var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-//                var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
-//                SecurityContextHolder.getContext().setAuthentication(authentication);
-//            }
-//        }
-
-
-//    private String recoverToken(HttpServletRequest request) {
-//        var authHeader = request.getHeader("Authorization");
-//        if (authHeader == null) return null;
-//        return authHeader.replace("Bearer ", "");
-//    }
-

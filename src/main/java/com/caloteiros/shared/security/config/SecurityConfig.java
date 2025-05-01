@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**","/login", "/auth/login", "/register", "/auth/register").permitAll()
                         .requestMatchers("/password/**", "/password/forgot", "/password/reset").permitAll()
                         .requestMatchers("/css/**", "/favicon", "/images/**", "/javascript/**", "/WEB-INF/tags/**", "/tags/**", "/WEB-INF/**","/views/includes/**", "/views/auth/**", "/views/users/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui**", "/v3**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

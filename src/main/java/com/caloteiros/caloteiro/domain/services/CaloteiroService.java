@@ -58,7 +58,7 @@ public class CaloteiroService {
         Page<Caloteiro> page = caloteiroRepository.findByUserEmail(
                 userEmail, PageRequest.of(pageNumber, pageSize, sort));
 
-        List<CaloteiroDTO> caloteiros = page.get()
+        List<CaloteiroDTO> caloteiros = page.stream()
                                             .map(caloteiroMapper::toCaloteiroDTO)
                                             .toList();
 
@@ -89,7 +89,7 @@ public class CaloteiroService {
 
     @CacheEvict(value = {"caloteiros_listByUser", "caloteiros_search"}, allEntries = true)
     @Transactional
-    public void create(CreateCaloteiroDTO createCaloteiroDTO) {
+    public CaloteiroDTO create(CreateCaloteiroDTO createCaloteiroDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User userPrincipal = (User) authentication.getPrincipal();
         String email = userPrincipal.getEmail();
@@ -101,6 +101,7 @@ public class CaloteiroService {
         caloteiro.setUser(user);
 
         caloteiroRepository.save(caloteiro);
+        return caloteiroMapper.toCaloteiroDTO(caloteiro);
     }
 
     @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#id")
@@ -131,7 +132,7 @@ public class CaloteiroService {
 
     private Sort getSort(String sortField, String sortOrder) {
         if (!VALID_SORT_FIELDS.contains(sortField)) {
-            throw new IllegalArgumentException(("Campo de orndeção inválido: " + sortField));
+            throw new CaloteiroException("Campo de orndeção inválido: " + sortField);
         }
         Sort sort = Sort.by(sortField);
         return "desc".equalsIgnoreCase(sortOrder) ? sort.descending() : sort.ascending();
