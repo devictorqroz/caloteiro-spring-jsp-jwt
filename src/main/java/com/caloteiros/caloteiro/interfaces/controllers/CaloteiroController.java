@@ -5,6 +5,7 @@ import com.caloteiros.caloteiro.application.dto.UpdateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CreateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CaloteiroDTO;
 import com.caloteiros.caloteiro.domain.services.CaloteiroService;
+import com.caloteiros.user.domain.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +24,11 @@ import org.springframework.web.servlet.ModelAndView;
 public class CaloteiroController {
 
     private final CaloteiroService caloteiroService;
+    private final UserService userService;
 
-    public CaloteiroController(CaloteiroService caloteiroService) {
+    public CaloteiroController(CaloteiroService caloteiroService, UserService userService) {
         this.caloteiroService = caloteiroService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -68,17 +72,14 @@ public class CaloteiroController {
     public ModelAndView createCaloteiro(
             @Valid @ModelAttribute CreateCaloteiroDTO createCaloteiroDTO,
             BindingResult bindingResult) {
-        ModelAndView mv = new ModelAndView();
 
         if (bindingResult.hasErrors()) {
-            mv.setViewName("caloteiros/new-caloteiro");
-            return mv;
+            return new ModelAndView("caloteiros/new-caloteiro");
         }
 
         this.caloteiroService.create(createCaloteiroDTO);
 
-        mv.setViewName("caloteiros/caloteiro-created");
-        return mv;
+        return new ModelAndView("caloteiros/caloteiro-created");
     }
 
     @GetMapping("/{id}/edit")
@@ -113,6 +114,7 @@ public class CaloteiroController {
 
     @DeleteMapping("/{id}")
     public ModelAndView deleteCaloteiroById(@PathVariable Long id) {
+
         caloteiroService.delete(id);
         return new ModelAndView("redirect:/caloteiros/caloteiro-deleted");
     }

@@ -5,11 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface CaloteiroRepository extends JpaRepository<Caloteiro, Long> {
-    Page<Caloteiro> findByNameContainingIgnoreCase(String name, Pageable pageable);
-    Page<Caloteiro> findByUserEmail(String email, Pageable pageable);
-    Optional<Caloteiro> findByIdAndUserUsername(Long id, String username);
+    Page<Caloteiro> findByNameContainingIgnoreCaseAndUserId(String name, Long userId, Pageable pageable);
+    Optional<Caloteiro> findByIdAndUserId(Long id, Long userId);
+    Page<Caloteiro> findByUserId(Long userId, Pageable pageable);
 }

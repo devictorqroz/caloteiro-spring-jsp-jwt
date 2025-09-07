@@ -27,6 +27,20 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Cacheable(value = "users", key = "#id")
+    public UserDTO findById(Long id) {
+        return userRepository.findById(id)
+                .map(userMapper::toUserDTO)
+                .orElseThrow(() -> new UserException("Usuário não encontrado com o ID " + id));
+    }
+
+    public Long findIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(User::getId)
+                .orElseThrow(() -> new UserException("Usuário não encontrado"));
+    }
+
+
     @CacheEvict(value = "users", allEntries = true)
     @Transactional
     public void createUser(User user) {
@@ -37,13 +51,6 @@ public class UserService {
         String hash = passwordEncoder.encode(user.getPassword());
         user.setPassword(hash);
         userRepository.save(user);
-    }
-
-    @Cacheable(value = "users", key = "#id")
-    public UserDTO findById(Long id) {
-        return userRepository.findById(id)
-                .map(userMapper::toUserDTO)
-                .orElseThrow(() -> new UserException("Usuário não encontrado com o ID " + id));
     }
 
     @CacheEvict(value = "users", key = "#id")
@@ -74,10 +81,5 @@ public class UserService {
         }
 
         userRepository.delete(user);
-    }
-
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserException("Usuário não encontrado com o username: " + username));
     }
 }

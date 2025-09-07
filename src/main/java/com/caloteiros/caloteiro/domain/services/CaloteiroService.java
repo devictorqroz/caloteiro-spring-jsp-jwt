@@ -32,8 +32,8 @@ import java.util.Set;
 public class CaloteiroService {
 
     private final CaloteiroRepository caloteiroRepository;
-    private final UserRepository userRepository;
     private final CaloteiroMapper caloteiroMapper;
+    private final UserRepository userRepository;
 
     private static final Set<String> VALID_SORT_FIELDS = Set.of("name", "debt", "debtDate");
 
@@ -44,8 +44,9 @@ public class CaloteiroService {
     }
 
     @Cacheable(value = "caloteiros_listByUser",
-            key = "T(java.util.Objects).hash(#pageNumber, #pageSize, #sortField, #sortOrder, #userEmail)")
+            key = "#userId + ':' + #pageNumber + ':' + #pageSize + ':' + #sortField + ':' + #sortOrder")
     public CaloteiroPageDTO listByUser(
+            Long userId,
             @PositiveOrZero int pageNumber,
             @Positive @Max(100) int pageSize,
             String sortField,
@@ -53,31 +54,45 @@ public class CaloteiroService {
 
         Sort sort = getSort(sortField, sortOrder);
 
-        String userEmail = getCurrentUserEmail();
-
-        Page<Caloteiro> page = caloteiroRepository.findByUserEmail(
-                userEmail, PageRequest.of(pageNumber, pageSize, sort));
+        Page<Caloteiro> page = caloteiroRepository.findByUserId(
+                userId, PageRequest.of(pageNumber, pageSize, sort));
 
         List<CaloteiroDTO> caloteiros = page.stream()
-                                            .map(caloteiroMapper::toCaloteiroDTO)
-                                            .toList();
-
-         return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
-    }
-
-    @Cacheable(value = "caloteiros", key = "#id")
-    public CaloteiroDTO findById(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        return caloteiroRepository.findByIdAndUserUsername(id, username)
                 .map(caloteiroMapper::toCaloteiroDTO)
-                .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id));
+                .toList();
+
+        return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
     }
 
-    @Cacheable(value = "caloteiros_search", key = "#name + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
-    public CaloteiroPageDTO searchByName(String name, Pageable pageable) {
-        Page<Caloteiro> page = caloteiroRepository.findByNameContainingIgnoreCase(name, pageable);
+    public CaloteiroPageDTO listByUser(
+            @PositiveOrZero int pageNumber,
+            @Positive @Max(100) int pageSize,
+            String sortField,
+            String sortOrder) {
+
+        Long userId = getCurrentUserId();
+
+        return listByUser(userId, pageNumber, pageSize, sortField, sortOrder);
+    }
+
+    @Cacheable(value = "caloteiros", key = "#userId + ':' + #id")
+    public CaloteiroDTO findById(Long id, Long userId) {
+
+        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new CaloteiroException("Caloteiro não encontrado com o ID: " + id));
+
+        return caloteiroMapper.toCaloteiroDTO(caloteiro);
+    }
+
+    public CaloteiroDTO findById(Long id) {
+        Long userId = getCurrentUserId();
+        return findById(id, userId);
+    }
+
+    @Cacheable(value = "caloteiros_search",
+            key = "#userId + ':' + #name + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
+    public CaloteiroPageDTO searchByName(String name, Pageable pageable, Long userId) {
+        Page<Caloteiro> page = caloteiroRepository.findByNameContainingIgnoreCaseAndUserId(name, userId, pageable);
 
         List<CaloteiroDTO> caloteiros = page.getContent()
                 .stream()
@@ -87,14 +102,16 @@ public class CaloteiroService {
         return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
     }
 
-    @CacheEvict(value = {"caloteiros_listByUser", "caloteiros_search"}, allEntries = true)
-    @Transactional
-    public CaloteiroDTO create(CreateCaloteiroDTO createCaloteiroDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User userPrincipal = (User) authentication.getPrincipal();
-        String email = userPrincipal.getEmail();
+    public CaloteiroPageDTO searchByName(String name, Pageable pageable) {
+        Long userId = getCurrentUserId();
+        return searchByName(name, pageable, userId);
+    }
 
-        User user = userRepository.findByEmail(email)
+    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, allEntries = true)
+    @Transactional
+    public CaloteiroDTO create(Long userId, CreateCaloteiroDTO createCaloteiroDTO) {
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException("Usuário não encontrado"));
 
         Caloteiro caloteiro = caloteiroMapper.fromCreateDTOToEntity(createCaloteiroDTO);
@@ -104,29 +121,32 @@ public class CaloteiroService {
         return caloteiroMapper.toCaloteiroDTO(caloteiro);
     }
 
-    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#id")
-    @Transactional
-    public void delete(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+    public CaloteiroDTO create(CreateCaloteiroDTO createCaloteiroDTO) {
+        Long userId = getCurrentUserId();
+        return create(userId, createCaloteiroDTO);
+    }
 
-        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserUsername(id, username)
-                        .orElseThrow(() -> new CaloteiroException("Não foi possível excluir o Caloteiro"));
+    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#userId + ':' + #id")
+    @Transactional
+    public void delete(Long id, Long userId) {
+        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new CaloteiroException("Não foi possível excluir o Caloteiro"));
 
         caloteiroRepository.delete(caloteiro);
     }
 
-    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#id")
+    public void delete(Long id) {
+        Long userId = getCurrentUserId();
+        delete(id, userId);
+    }
+
+    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#userId + ':' + #id")
     @Transactional
-    public void update(Long id, UpdateCaloteiroDTO updateCaloteiro) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-
-        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserUsername(id, username)
+    public void update(Long id, Long userId, UpdateCaloteiroDTO updateCaloteiroDTO) {
+        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new CaloteiroException("Não foi possível atualizar o caloteiro"));
 
-        caloteiro = caloteiroMapper.fromUpdateDTOToEntity(updateCaloteiro, caloteiro);
+        caloteiro = caloteiroMapper.fromUpdateDTOToEntity(updateCaloteiroDTO, caloteiro);
         caloteiroRepository.save(caloteiro);
     }
 
@@ -138,9 +158,27 @@ public class CaloteiroService {
         return "desc".equalsIgnoreCase(sortOrder) ? sort.descending() : sort.ascending();
     }
 
-    private String getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User userPrincipal = (User) authentication.getPrincipal();
-        return userPrincipal.getEmail();
+    public void update(Long id, UpdateCaloteiroDTO updateCaloteiroDTO) {
+        Long userId = getCurrentUserId();
+        update(id, userId, updateCaloteiroDTO);
+    }
+
+    private Long getCurrentUserId() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+
+        if (principal instanceof User u && u.getId() != null) {
+            return u.getId();
+        }
+
+        String login = auth.getName();
+
+        Long id = userRepository.findIdByEmail(login);
+        if (id != null) return id;
+
+        id = userRepository.findIdByUsername(login);
+        if (id != null) return id;
+
+        throw new UserException("Usuário não encontrado para o identificador: " + login);
     }
 }
