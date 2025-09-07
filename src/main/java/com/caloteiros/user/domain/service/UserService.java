@@ -40,7 +40,6 @@ public class UserService {
                 .orElseThrow(() -> new UserException("Usuário não encontrado"));
     }
 
-
     @CacheEvict(value = "users", allEntries = true)
     @Transactional
     public void createUser(User user) {
