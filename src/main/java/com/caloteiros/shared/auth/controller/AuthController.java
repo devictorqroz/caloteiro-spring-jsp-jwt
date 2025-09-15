@@ -10,6 +10,8 @@ import com.caloteiros.user.domain.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private final UserRepository repository;
@@ -66,10 +70,14 @@ public class AuthController {
             Model model,
             HttpSession session) {
 
+        logger.info("Tentativa de login para o email: {}", loginRequest.email());
+
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage())
                     .collect(Collectors.toList());
+
+            logger.warn("Falha na validação dos dados de login para o email '{}': {}", loginRequest.email(), errors);
             model.addAttribute("errors", errors);
             return "auth/login";
         }
@@ -77,6 +85,7 @@ public class AuthController {
         User user = repository.findByEmail(loginRequest.email()).orElse(null);
 
         if (user == null || !passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
+            logger.warn("Falha na autenticação para o email '{}': Credenciais inválidas.", loginRequest.email());
             model.addAttribute("errors", Collections.singletonList("Credenciais inválidas"));
             return "auth/login";
         }
@@ -88,6 +97,8 @@ public class AuthController {
         session.setAttribute("loggedUserId", user.getId());
         session.setAttribute("loggedUserName", user.getUsername());
 
+        logger.info("Usuário com email '{}' (ID: {}) autenticado com sucesso.", user.getEmail(), user.getId());
+
         return "home";
     }
 
@@ -98,10 +109,14 @@ public class AuthController {
             Model model,
             HttpSession session) {
 
+        logger.info("Tentativa de registro para o email: {}", registerRequest.email());
+
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage())
                     .collect(Collectors.toList());
+
+            logger.warn("Falha na validação dos dados de registro para o email '{}': {}", registerRequest.email(), errors);
             model.addAttribute("errors", errors);
             return "auth/register";
         }
@@ -111,6 +126,7 @@ public class AuthController {
         try {
             userService.createUser(user);
         } catch (UserException e) {
+            logger.warn("Falha ao registrar usuário com email '{}': {}", user.getEmail(), e.getMessage());
             model.addAttribute("errors", Collections.singletonList(e.getMessage()));
             return "auth/register";
         }
@@ -118,12 +134,6 @@ public class AuthController {
         String token = this.tokenService.generateToken(user);
         session.setAttribute("JWT_TOKEN", token);
         session.setAttribute("AUTHENTICATED_USER", user);
-        return "redirect:/auth/login";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
-        request.getSession().invalidate();
         return "redirect:/auth/login";
     }
 }

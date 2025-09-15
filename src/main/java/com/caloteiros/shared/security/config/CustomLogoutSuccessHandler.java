@@ -1,8 +1,11 @@
 package com.caloteiros.shared.security.config;
 
+import com.caloteiros.user.domain.entities.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -16,6 +19,8 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
     private final CacheManager cacheManager;
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomLogoutSuccessHandler.class);
+
     public CustomLogoutSuccessHandler(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
@@ -25,6 +30,12 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
                         Authentication authentication) throws IOException, ServletException {
 
         if (authentication != null) {
+
+            if (authentication.getPrincipal() instanceof User) {
+                User user = (User) authentication.getPrincipal();
+                logger.info("Usuário '{}' (ID: {}) realizou logout com sucesso.", user.getUsername(), user.getId());
+            }
+
             cacheManager.getCache("caloteiros").clear();
             cacheManager.getCache("caloteiros_listByUser").clear();
             cacheManager.getCache("caloteiros_search").clear();
