@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .dispatcherTypeMatchers(FORWARD, ERROR).permitAll()
                         .requestMatchers("/auth/**","/login", "/auth/login", "/register", "/auth/register").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/password/**", "/password/forgot", "/password/reset").permitAll()
                         .requestMatchers("/css/**", "/favicon", "/images/**", "/javascript/**", "/WEB-INF/tags/**", "/tags/**", "/WEB-INF/**","/views/includes/**", "/views/auth/**", "/views/users/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui**", "/v3**", "/v3/api-docs/**").permitAll()
