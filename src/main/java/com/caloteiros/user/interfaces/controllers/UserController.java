@@ -3,7 +3,8 @@ package com.caloteiros.user.interfaces.controllers;
 import com.caloteiros.user.application.dto.DeleteUserDTO;
 import com.caloteiros.user.application.dto.UpdateUserDTO;
 import com.caloteiros.user.application.dto.UserDTO;
-import com.caloteiros.user.domain.entities.User;
+import com.caloteiros.user.domain.exceptions.PasswordException;
+import com.caloteiros.user.domain.exceptions.UserException;
 import com.caloteiros.user.domain.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -13,8 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.security.Principal;
 
 @Controller
 @RequestMapping("/users")
@@ -27,64 +26,76 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ModelAndView showProfile(ModelAndView mv, HttpSession session) {
+    public String showProfile(Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("loggedUserId");
-        UserDTO updateUser = userService.findById(userId);
-        mv.addObject("updateUser", updateUser);
-        return mv;
+        UserDTO currentUser = userService.findById(userId);
+
+        UpdateUserDTO formObject = new UpdateUserDTO(
+                currentUser.name(),
+                currentUser.email(),
+                "", "", ""
+        );
+        model.addAttribute("updateUserDTO", formObject);
+        return "users/profile";
     }
 
     @PutMapping("/profile")
-    public ModelAndView updateProfile(
-            @Valid @ModelAttribute UpdateUserDTO updateUserDTO,
+    public String updateProfile(
+            @Valid @ModelAttribute("updateUserDTO") UpdateUserDTO updateUserDTO,
             BindingResult bindingResult,
-            HttpSession session) {
-
-        ModelAndView mv = new ModelAndView();
+            HttpSession session,
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
-            mv.setViewName("users/profile");
-            return mv;
+            return "users/profile";
         }
 
         Long userId = (Long) session.getAttribute("loggedUserId");
-        userService.update(userId, updateUserDTO);
 
-        mv.setViewName("redirect:/users/confirmation-user");
-        return mv;
+        try {
+            userService.update(userId, updateUserDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "Perfil atualizado com sucesso!");
+            return "redirect:/users/profile";
+        } catch (PasswordException | UserException e) {
+            model.addAttribute("errors", e.getMessage());
+            return "users/profile";
+        }
     }
 
     @GetMapping("/delete")
-    public ModelAndView displayDeleteProfileForm(HttpSession session) {
+    public String displayDeleteProfileForm(HttpSession session, Model model) {
         var userId = session.getAttribute("loggedUserId");
-
-        ModelAndView mv = new ModelAndView("users/confirm-delete");
-        mv.addObject("userId", userId);
-
-        return mv;
+        model.addAttribute("userId", userId);
+        model.addAttribute("deleteUserDTO", new DeleteUserDTO(""));
+        return "users/confirm-delete";
     }
 
     @PostMapping("/delete")
-    public ModelAndView confirmDeleteUser(
+    public String confirmDeleteUser(
             @RequestParam("userId") Long userId,
             @Valid @ModelAttribute DeleteUserDTO deleteUserDTO,
-            BindingResult bindingResult) {
-
-        ModelAndView mv = new ModelAndView();
+            BindingResult bindingResult,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
-            mv.setViewName("users/confirm-delete");
-            return mv;
+            model.addAttribute("userId", userId);
+            return "users/confirm-delete";
         }
 
-        userService.delete(userId, deleteUserDTO);
+        try {
+            userService.delete(userId, deleteUserDTO);
+        } catch (UserException e) {
+            model.addAttribute("userId", userId);
+            model.addAttribute("errors", e.getMessage());
+            return "users/confirm-delete";
+        }
 
-        mv.setViewName("redirect:/logout");
-        return mv;
+        return "redirect:/auth/logout";
     }
 
     @GetMapping("/confirmation-user")
-    public ModelAndView confirmationUser() {
-        return new ModelAndView("users/confirmation-user");
+    public String confirmationUser() {
+        return "users/confirmation-user";
     }
 }

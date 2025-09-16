@@ -33,18 +33,18 @@ main {
     margin: 5px 0;
 }
 
-.action-menu ol {
+.action-menu ul {
     list-style-type: none;
     padding: 0;
     text-align: center;
     margin-top: 50px;
 }
 
-.action-menu ol li {
+.action-menu ul li {
     margin-bottom: 20px;
 }
 
-.action-menu ol li a {
+.action-menu ul li a {
     display: inline-block;
     padding: 10px 20px;
     background-color: #333;
@@ -56,7 +56,7 @@ main {
     transition: background-color 0.3s;
 }
 
-.action-menu ol li a:hover {
+.action-menu ul li a:hover {
     background-color: #555;
 }
 
@@ -73,7 +73,7 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .action-menu ol li a {
+    .action-menu ul li a {
         width: 100%;
         padding: 10px;
     }

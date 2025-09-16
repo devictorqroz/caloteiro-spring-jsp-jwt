@@ -50,11 +50,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                    .logoutSuccessHandler(customLogoutSuccessHandler)
-                    .permitAll()
-                .and()
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                )
                 .exceptionHandling()
                     .accessDeniedPage("/error");
 

@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserService {
@@ -64,7 +65,6 @@ public class UserService {
     @Transactional
     public void update(Long id, UpdateUserDTO updateUserDTO) {
         logger.info("Iniciando processo de atualização para o usuário ID: {}", id);
-
         logger.debug("Dados recebidos para atualização do usuário ID {}: {}", id, updateUserDTO);
 
         User user = userRepository.findById(id)
@@ -75,16 +75,22 @@ public class UserService {
 
         user = userMapper.fromUpdateToEntity(updateUserDTO, user);
 
-        if (updateUserDTO.newPassword() != null && !updateUserDTO.newPassword().isBlank()) {
+        if (StringUtils.hasText(updateUserDTO.newPassword())) {
             logger.info("Tentativa de atualização de senha para o usuário ID: {}", id);
+
+            if (!StringUtils.hasText(updateUserDTO.currentPassword()) ||
+                !passwordEncoder.matches(updateUserDTO.currentPassword(), user.getPassword())) {
+                logger.warn("Falha na atualização do usuário ID {}: senha atual inválida.", id);
+                throw new PasswordException("A senha atual está incorreta.");
+            }
+
             if (!updateUserDTO.newPassword().equals(updateUserDTO.confirmPassword())) {
-                logger.warn("Falha na atualização do usuário ID {}: senhas não coincidem.", id);
-                throw new PasswordException("Passwords não coincidem");
+                logger.warn("Falha na atualização do usuário ID {}: senhas novas não coincidem.", id);
+                throw new PasswordException("A nova senha e a confirmação não coincidem.");
             }
 
             String hash = passwordEncoder.encode(updateUserDTO.newPassword());
             user.setPassword(hash);
-
             logger.info("Senha do usuário ID {} será atualizada.", id);
         }
 

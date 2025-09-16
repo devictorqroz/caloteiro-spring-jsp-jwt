@@ -4,17 +4,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record UpdateUserDTO(
-        @NotBlank(message = "O nome é obrigatório.")
+        @NotBlank(message = "O nome não pode estar em branco.")
         String name,
 
-        @NotBlank(message = "O email é obrigatório.")
-        @Email(message = "O email deve ser válido.")
+        @NotBlank(message = "O email não pode estar em branco.")
+        @Email(message = "formato de email inválido.")
         String email,
 
-        @NotBlank(message = "O password é obrigatório.")
+        String currentPassword,
         String newPassword,
-
-        @NotBlank(message = "O confirmação de password é obrigatório.")
         String confirmPassword
 ) {
 }

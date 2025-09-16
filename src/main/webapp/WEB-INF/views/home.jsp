@@ -19,28 +19,15 @@
                 <p>Aqui você pode gerenciar e monitorar as ações dos usuários e caloteiros.</p>
             </section>
 
-            <section class="action-menu">
-                <ol>
-                    <li>
-                        <a href='<c:url value="/caloteiros/new" />'>Adicionar Caloteiro</a>
-                    </li>
-                    <li>
-                        <a href='<c:url value="/caloteiros" />'>Listar Caloteiros</a>
-                    </li>
-                    <li>
-                        <a href='<c:url value="/auth/register" />'>Criar Novo Usuário</a>
-                    </li>
-                    <li>
-                        <a href='<c:url value="/users/profile" />'>Atualizar Dados do Usuário</a>
-                    </li>
-                    <li>
-                        <a href='<c:url value="/logout" />'>Logout</a>
-                    </li>
-                    <li>
-                        <a href='<c:url value="/users/delete" />'>Excluir conta</a>
-                    </li>
-                </ol>
-            </section>
+            <nav class="action-menu">
+                <ul>
+                    <li><a href='<c:url value="/caloteiros/new" />'>Adicionar Caloteiro</a></li>
+                    <li><a href='<c:url value="/caloteiros" />'>Listar Caloteiros</a></li>
+                    <li><a href='<c:url value="/users/profile" />'>Atualizar Dados do Usuário</a></li>
+                    <li><a href='<c:url value="/auth/logout" />'>Logout</a></li>
+                    <li><a href='<c:url value="/users/delete" />'>Excluir conta</a></li>
+                </ul>
+            </nav>
         </main>
 
         <footer>
