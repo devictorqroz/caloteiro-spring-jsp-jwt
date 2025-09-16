@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +46,46 @@ public class CaloteiroService {
         this.caloteiroMapper = caloteiroMapper;
     }
 
+
+    public CaloteiroPageDTO listByUser(
+            @PositiveOrZero int pageNumber,
+            @Positive @Max(100) int pageSize,
+            String sortField,
+            String sortOrder) {
+
+        Long userId = getCurrentUserId();
+        return listByUser(userId, pageNumber, pageSize, sortField, sortOrder);
+    }
+
+    public CaloteiroDTO findById(Long id) {
+        Long userId = getCurrentUserId();
+        return findById(id, userId);
+    }
+
+    public CaloteiroPageDTO searchByName(String name, Pageable pageable) {
+        Long userId = getCurrentUserId();
+        return searchByName(name, pageable, userId);
+    }
+
+    @Transactional
+    public CaloteiroDTO create(CreateCaloteiroDTO createCaloteiroDTO) {
+        Long userId = getCurrentUserId();
+        return create(userId, createCaloteiroDTO);
+    }
+
+    @Transactional
+    public void update(Long id, UpdateCaloteiroDTO updateCaloteiroDTO) {
+        Long userId = getCurrentUserId();
+        update(id, userId, updateCaloteiroDTO);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Long userId = getCurrentUserId();
+        delete(id, userId);
+    }
+
+
     @Cacheable(value = "caloteiros_listByUser",
             key = "#userId + ':' + #pageNumber + ':' + #pageSize + ':' + #sortField + ':' + #sortOrder")
     public CaloteiroPageDTO listByUser(
@@ -57,7 +96,6 @@ public class CaloteiroService {
             String sortOrder) {
 
         logger.info("Listando caloteiros para o usuário ID: {}", userId);
-
         logger.debug("Parâmetros de paginação: pageNumber={}, pageSize={}, sortField={}, sortOrder={}",
                 pageNumber, pageSize, sortField, sortOrder);
 
@@ -75,22 +113,9 @@ public class CaloteiroService {
         return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
     }
 
-    public CaloteiroPageDTO listByUser(
-            @PositiveOrZero int pageNumber,
-            @Positive @Max(100) int pageSize,
-            String sortField,
-            String sortOrder) {
-
-        Long userId = getCurrentUserId();
-
-        return listByUser(userId, pageNumber, pageSize, sortField, sortOrder);
-    }
-
     @Cacheable(value = "caloteiros", key = "#userId + ':' + #id")
     public CaloteiroDTO findById(Long id, Long userId) {
-
         logger.info("Buscando caloteiro ID: {} para o usuário ID: {}", id, userId);
-
 
         Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> {
@@ -102,15 +127,9 @@ public class CaloteiroService {
         return caloteiroMapper.toCaloteiroDTO(caloteiro);
     }
 
-    public CaloteiroDTO findById(Long id) {
-        Long userId = getCurrentUserId();
-        return findById(id, userId);
-    }
-
     @Cacheable(value = "caloteiros_search",
             key = "#userId + ':' + #name + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
     public CaloteiroPageDTO searchByName(String name, Pageable pageable, Long userId) {
-
         logger.info("Buscando caloteiros por nome contendo '{}' para o usuário ID: {}", name, userId);
 
         Page<Caloteiro> page = caloteiroRepository.findByNameContainingIgnoreCaseAndUserId(name, userId, pageable);
@@ -125,21 +144,13 @@ public class CaloteiroService {
 
         logger.info("Busca por '{}' encontrou {} caloteiros na página {} para o usuário ID: {}",
                 name, page.getNumberOfElements(), page.getNumber(), userId);
-
         return caloteiroMapper.getCaloteiroPageDTO(caloteiros, page);
-    }
-
-    public CaloteiroPageDTO searchByName(String name, Pageable pageable) {
-        Long userId = getCurrentUserId();
-        return searchByName(name, pageable, userId);
     }
 
     @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, allEntries = true)
     @Transactional
     public CaloteiroDTO create(Long userId, CreateCaloteiroDTO createCaloteiroDTO) {
-
         logger.info("Iniciando criação de caloteiro para o usuário ID: {}", userId);
-
         logger.debug("Dados recebidos para criação: {}", createCaloteiroDTO);
 
         User user = userRepository.findById(userId)
@@ -158,39 +169,10 @@ public class CaloteiroService {
         return caloteiroMapper.toCaloteiroDTO(caloteiro);
     }
 
-    public CaloteiroDTO create(CreateCaloteiroDTO createCaloteiroDTO) {
-        Long userId = getCurrentUserId();
-        return create(userId, createCaloteiroDTO);
-    }
-
-    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#userId + ':' + #id")
-    @Transactional
-    public void delete(Long id, Long userId) {
-
-        logger.info("Iniciandi exclusão do caloteiro ID: {} pelo usuário ID: {}", id, userId);
-
-        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> {
-                    logger.warn("Falha na exclusão: Caloteiro ID {} não pertence ou não existe para o usuário ID: {}", id, userId);
-                    return new CaloteiroException("Não foi possível excluir o Caloteiro");
-                });
-
-        caloteiroRepository.delete(caloteiro);
-
-        logger.info("Caloteiro ID: {} excluído com sucesso.", id);
-    }
-
-    public void delete(Long id) {
-        Long userId = getCurrentUserId();
-        delete(id, userId);
-    }
-
     @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#userId + ':' + #id")
     @Transactional
     public void update(Long id, Long userId, UpdateCaloteiroDTO updateCaloteiroDTO) {
-
         logger.info("Iniciando atualização do caloteiro ID: {} pelo usuário ID: {}", id, userId);
-
         logger.debug("Dados recebidos para atualização: {}", updateCaloteiroDTO);
 
         Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
@@ -205,9 +187,20 @@ public class CaloteiroService {
         logger.info("Caloteiro ID: {} atualizado com sucesso.", id);
     }
 
-    public void update(Long id, UpdateCaloteiroDTO updateCaloteiroDTO) {
-        Long userId = getCurrentUserId();
-        update(id, userId, updateCaloteiroDTO);
+    @CacheEvict(value = {"caloteiros", "caloteiros_listByUser", "caloteiros_search"}, key = "#userId + ':' + #id")
+    @Transactional
+    public void delete(Long id, Long userId) {
+        logger.info("Iniciandi exclusão do caloteiro ID: {} pelo usuário ID: {}", id, userId);
+
+        Caloteiro caloteiro = caloteiroRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> {
+                    logger.warn("Falha na exclusão: Caloteiro ID {} não pertence ou não existe para o usuário ID: {}", id, userId);
+                    return new CaloteiroException("Não foi possível excluir o Caloteiro");
+                });
+
+        caloteiroRepository.delete(caloteiro);
+
+        logger.info("Caloteiro ID: {} excluído com sucesso.", id);
     }
 
     private Sort getSort(String sortField, String sortOrder) {
@@ -220,31 +213,23 @@ public class CaloteiroService {
     }
 
     private Long getCurrentUserId() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = auth.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        logger.debug("Tentando obter ID do usuário logado. Principal: {}, Nome de autenticação: {},",
-                principal.getClass().getSimpleName(), auth.getName());
-
-        if (principal instanceof User u && u.getId() != null) {
-            logger.debug("ID do usuário obtido diretamente do objeto User principal: {}", u.getId());
-            return u.getId();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            logger.error("Tentativa de obter ID do usuário sem autenticação.");
+            throw new UserException("Nenhum usuário autenticado encontrado.");
         }
 
-        String login = auth.getName();
-        Long id = userRepository.findIdByEmail(login);
-        if (id != null) {
-            logger.debug("ID do usuário obtido via e-mail '{}': {}", login, id);
-            return id;
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof User user) {
+            logger.debug("ID do usuário obtido diretamente do objeto User principal: {}", user.getId());
+            return user.getId();
         }
 
-        id = userRepository.findIdByUsername(login);
-        if (id != null) {
-            logger.debug("ID do usuário obtido via username '{}': {}", login, id);
-            return id;
-        }
+        logger.error("O objeto 'principal' da autenticação não é uma instãncia de User. Classe encontrada: {}",
+                principal.getClass().getName());
 
-        logger.error("Não foi possível encontrar o ID do usuário para o identificador: {}", login);
-        throw new UserException("Usuário não encontrado para o identificador: " + login);
+        throw new IllegalStateException("O principal de segurança não é uma instância de User. Verifique o SecurityFilter.");
     }
 }
