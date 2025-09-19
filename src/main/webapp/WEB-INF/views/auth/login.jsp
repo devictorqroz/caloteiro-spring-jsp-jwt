@@ -33,14 +33,14 @@
                     </div>
                 </c:if>
 
-				<triadTag:textField
+				<app:textField
 					nameField="email"
 					label="Email:"
 					id="labelEmail"
 					value="" />
                 <form:errors path="email" cssClass="error-text" />
 
-				<triadTag:password
+				<app:password
 					passwordField="password"
 					label="Password:"
 					id="labelPassword"

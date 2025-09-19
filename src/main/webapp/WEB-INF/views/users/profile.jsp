@@ -25,13 +25,13 @@
                 <fieldset>
                     <legend>Dados Pessoais</legend>
 
-                    <triadTag:textField
+                    <app:textField
                         nameField="name"
                         label="Nome:"
                         id="labelName"
                         value="${updateUserDTO.name()}" />
 
-                    <triadTag:textField
+                    <app:textField
                         nameField="email"
                         label="Email:"
                         id="labelEmal"
@@ -43,19 +43,19 @@
 
                     <p class="note">Preencha os três campos abaixo apenas se desejar alterar sua senha.</p>
 
-                    <triadTag:password
+                    <app:password
                         passwordField="currentPassword"
                         label="Senha Atual:"
                         id="labelCurrentPassword"
                         value="" />
 
-                    <triadTag:password
+                    <app:password
                         passwordField="newPassword"
                         label="Novo Password:"
                         id="labelnewPassword"
                         value="" />
 
-                    <triadTag:password
+                    <app:password
                         passwordField="confirmPassword"
                         label="Confirmar Password:"
                         id="labelConfirmPassword"

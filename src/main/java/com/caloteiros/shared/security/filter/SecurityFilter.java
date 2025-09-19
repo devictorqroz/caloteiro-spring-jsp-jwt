@@ -1,6 +1,5 @@
 package com.caloteiros.shared.security.filter;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.caloteiros.shared.security.jwt.TokenService;
 import com.caloteiros.user.domain.entities.User;
 import com.caloteiros.user.domain.repositories.UserRepository;
@@ -9,73 +8,78 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final TokenService tokenService;
 
-    @Autowired
-    TokenService tokenService;
+    private final List<String> publicRoutes = List.of(
+            "/auth/**", "/login", "/register", "/password/**", "/api/auth/**",
+            "/css/**", "/javascript/**", "/images/**", "/favicon.ico",
+            "/swagger-ui/**", "/v3/api-docs/**", "/error"
+    );
+
+    public SecurityFilter(UserRepository userRepository, TokenService tokenService) {
+        this.userRepository = userRepository;
+        this.tokenService = tokenService;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
-        if (SecurityContextHolder .getContext().getAuthentication() == null) {
+        if (isPublicRoute(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            String tokenJWT = null;
-            User user = null;
+        String tokenJWT = recoverToken(request);
 
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer ")) {
-                tokenJWT = authHeader.substring(7);
-            }
+        if (tokenJWT != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (tokenJWT == null) {
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    tokenJWT = (String) session.getAttribute("JWT_TOKEN");
-                    user = (User) session.getAttribute("AUTHENTICATED_USER");
-                }
-            }
+            String login = tokenService.validateToken(tokenJWT);
 
-            if (tokenJWT != null) {
+            if (login != null) {
+                User user = userRepository.findByEmail(login)
+                        .orElseThrow(() -> new RuntimeException("Usuário do token não encontrado no banco de dados"));
 
-                try {
-                    String login = tokenService.validateToken(tokenJWT);
-
-                    if (user != null) {
-                        user = userRepository.findByEmail(login)
-                            .orElseThrow(() -> new RuntimeException("User not found"));
-                    }
-
-                    var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-                    var authentication = new UsernamePasswordAuthenticationToken(user, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                    HttpSession session = request.getSession();
-                    if (session.getAttribute("AUTHENTICATED_USER") == null) {
-                        session.setAttribute("AUTHENTICATED_USER", user);
-                    }
-
-                } catch (JWTVerificationException ex) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token inválido");
-                    return;
-                }
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+
         filterChain.doFilter(request, response);
+    }
+
+    private String recoverToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            return (String) session.getAttribute("JWT_TOKEN");
+        }
+
+        return null;
+    }
+
+    private boolean isPublicRoute(String uri) {
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        return publicRoutes.stream().anyMatch(p -> pathMatcher.match(p, uri));
     }
 }

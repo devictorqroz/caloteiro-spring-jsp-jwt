@@ -29,7 +29,7 @@
 			<form action="/users/delete" method="POST" id="deleteUserForm">
                 <input type="hidden" name="userId" value="${userId}" />
 
-				<triadTag:password
+				<app:password
 					passwordField="password"
 					label="Confirme a Senha:"
 					id="labelPassword"
@@ -43,7 +43,7 @@
                     </div>
                 </c:if>
 
-				<input type="submit" id="deleteUserButton" value="Excluir" />
+				<input type="submit" class="delete-user-button" value="Excluir" />
 			</form>
 			<a href="/home" class="menu-link">Cancelar</a>
 		</main>

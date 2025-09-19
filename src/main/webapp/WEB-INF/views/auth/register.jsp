@@ -22,25 +22,25 @@
 		<main>
 			<form:form modelAttribute="registerRequest" action="/auth/register" method="POST" id="formRegister">
 
-				<triadTag:textField
+				<app:textField
 					nameField="name"
 					label="Nome:"
 					id="labelName" />
                 <form:errors path="name" cssClass="error-text" />
 
-                <triadTag:textField
+                <app:textField
 					nameField="email"
 					label="Email:"
 					id="labelEmal" />
                 <form:errors path="email" cssClass="error-text" />
 
-				<triadTag:password
+				<app:password
 					passwordField="password"
 					label="Password:"
 					id="labelPassword" />
                 <form:errors path="password" cssClass="error-text" />
 
-                <triadTag:password
+                <app:password
                     passwordField="confirmPassword"
                     label="Confirmar Senha:"
                     id="labelConfirmPassword" />

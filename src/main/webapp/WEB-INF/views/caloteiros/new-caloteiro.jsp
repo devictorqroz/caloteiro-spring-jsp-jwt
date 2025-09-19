@@ -26,28 +26,28 @@
 
             <form:form modelAttribute="createCaloteiroDTO" action="/caloteiros" method="POST" id="formNewCaloteiro">
 
-				<triadTag:textField
+				<app:textField
 					nameField="name" 
 					label="Nome:" 
 					id="labelName"
 					value="${createCaloteiroDTO.name()}" />
                 <form:errors path="name" cssClass="error-text" />
 
-				<triadTag:textField 
+				<app:textField
 					nameField="email" 
 					label="Email:" 
 					id="labelEmail"
 					value="${createCaloteiroDTO.email()}" />
                 <form:errors path="email" cssClass="error-text" />
 
-				<triadTag:textField 
+				<app:textField
 					nameField="debt" 
 					label="Devendo:" 
 					id="labelDebt"
 					value="${createCaloteiroDTO.debt()}" />
                 <form:errors path="debt" cssClass="error-text" />
 
-				<triadTag:textField 
+				<app:textField
 					nameField="debtDate" 
 					label="Data da Dívida:"
 					id="labelDate"

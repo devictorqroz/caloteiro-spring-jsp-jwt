@@ -3,7 +3,11 @@ package com.caloteiros.shared.utils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class DateUtils {
+public final class DateUtils {
+
+    private DateUtils() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static String formatDate(LocalDate date, String pattern) {
         if (date != null) {

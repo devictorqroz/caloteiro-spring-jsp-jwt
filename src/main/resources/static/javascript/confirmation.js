@@ -1,13 +1,13 @@
 
 $(document).ready(function() {
-    $('#deleteCaloteiroButton').click(function(event) {
+    $('.delete-caloteiro-button').click(function(event) {
         var result = confirm("Tem certeza de que deseja excluir este caloteiro?");
         if (!result) {
             event.preventDefault();
         }
     });
 
-    $('#deleteUserButton').click(function(event) {
+    $('.delete-user-button').click(function(event) {
         var result = confirm("Tem certeza de que deseja excluir sua conta?");
         if (!result) {
             event.preventDefault();

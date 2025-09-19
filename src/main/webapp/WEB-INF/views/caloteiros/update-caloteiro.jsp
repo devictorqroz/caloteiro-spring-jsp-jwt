@@ -25,28 +25,28 @@
 			<form:form modelAttribute="updateCaloteiroDTO" action="/caloteiros/${caloteiroId}" method="POST" id="formUpdateCaloteiro">
 				<input type="hidden" name="_method" value="PUT"/>
 
-				<triadTag:textField 
+				<app:textField
 					nameField="name" 
 					label="Nome:" 
 					id="labelName"
 					value="${updateCaloteiroDTO.name()}" />
                 <form:errors path="name" cssClass="error-text" />
 
-				<triadTag:textField 
+				<app:textField
 					nameField="email" 
 					label="Email:" 
 					id="labelEmail" 
 					value="${updateCaloteiroDTO.email()}" />
                 <form:errors path="email" cssClass="error-text" />
 
-				<triadTag:textField 
+				<app:textField
 					nameField="debt" 
 					label="Devendo:" 
 					id="labelDebt" 
 					value="${updateCaloteiroDTO.debt()}" />
                 <form:errors path="debt" cssClass="error-text" />
 
-				<triadTag:textField 
+				<app:textField
 					nameField="debtDate" 
 					label="Data da Dívida:"
 					id="labelDate" 
