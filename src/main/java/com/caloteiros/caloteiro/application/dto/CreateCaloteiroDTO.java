@@ -5,6 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public record CreateCaloteiroDTO(
 
     @Schema(description = "Data da dívida", example = "2025-05-01")
     @NotNull(message = "A data da dívida é obrigatória")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     LocalDate debtDate
 ) {
 }

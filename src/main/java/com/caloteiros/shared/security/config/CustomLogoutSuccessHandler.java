@@ -33,7 +33,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
             if (authentication.getPrincipal() instanceof User) {
                 User user = (User) authentication.getPrincipal();
-                logger.info("Usuário '{}' (ID: {}) realizou logout com sucesso.", user.getUsername(), user.getId());
+                logger.info("Usuário '{}' (ID: {}) realizou logout com sucesso.", user.getName(), user.getId());
             }
 
             cacheManager.getCache("caloteiros").clear();

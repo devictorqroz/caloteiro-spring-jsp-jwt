@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/includes/includes.jsp" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 	<head>
 	    <meta charset="UTF-8">
@@ -15,44 +16,42 @@
 	</head>
 	<body>
 		<header>
-			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/header.jsp" />
+			<c:import url="/WEB-INF/views/includes/header.jsp" />
 			<h1>Caloteiros</h1>
 		</header>
 		<main>
-			<form action="/auth/register" method="POST" id="">
+			<form:form modelAttribute="registerRequest" action="/auth/register" method="POST" id="formRegister">
 
 				<triadTag:textField
 					nameField="name"
 					label="Nome:"
-					id="labelName"
-					value="" />
+					id="labelName" />
+                <form:errors path="name" cssClass="error-text" />
 
                 <triadTag:textField
 					nameField="email"
 					label="Email:"
-					id="labelEmal"
-					value="" />
+					id="labelEmal" />
+                <form:errors path="email" cssClass="error-text" />
 
 				<triadTag:password
 					passwordField="password"
 					label="Password:"
-					id="labelPassword"
-					value="" />
+					id="labelPassword" />
+                <form:errors path="password" cssClass="error-text" />
 
-                <c:if test="${not empty errors}">
-                    <div class="error">
-                        <c:forEach var="error" items="${errors}">
-                            <p>${error}</p>
-                        </c:forEach>
-                    </div>
-                </c:if>
+                <triadTag:password
+                    passwordField="confirmPassword"
+                    label="Confirmar Senha:"
+                    id="labelConfirmPassword" />
+                <form:errors path="confirmPassword" cssClass="error-text" />
 
 				<input type="submit" value="Registrar" />
-			</form>
-			<a href="/home" class="menu-link">Retornar ao Menu</a>
+			</form:form>
+			<a href='<c:url value="/auth/login"/>' class="menu-link">Já tem uma conta? Faça o login</a>
 		</main>
 		<footer>
-			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />
+			<c:import url="/WEB-INF/views/includes/footer.jsp" />
 		</footer>
 	</body>
 </html>

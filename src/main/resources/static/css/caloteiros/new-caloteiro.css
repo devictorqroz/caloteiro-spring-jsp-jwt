@@ -68,6 +68,18 @@ form input[type="submit"]:hover {
     background-color: #555;
 }
 
+.error-text {
+    color: #D8000C;
+    background-color: #FFD2D2;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    display: block;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
 main a.menu-link {
     display: inline-block;
     margin-top: 20px;

@@ -3,9 +3,7 @@ package com.caloteiros.caloteiro.interfaces.controllers;
 import com.caloteiros.caloteiro.application.dto.CaloteiroPageDTO;
 import com.caloteiros.caloteiro.application.dto.UpdateCaloteiroDTO;
 import com.caloteiros.caloteiro.application.dto.CreateCaloteiroDTO;
-import com.caloteiros.caloteiro.application.dto.CaloteiroDTO;
 import com.caloteiros.caloteiro.domain.services.CaloteiroService;
-import com.caloteiros.user.domain.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
@@ -13,119 +11,105 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/caloteiros")
 public class CaloteiroController {
 
     private final CaloteiroService caloteiroService;
-    private final UserService userService;
 
-    public CaloteiroController(CaloteiroService caloteiroService, UserService userService) {
+    public CaloteiroController(CaloteiroService caloteiroService) {
         this.caloteiroService = caloteiroService;
-        this.userService = userService;
     }
 
     @GetMapping
-    public ModelAndView findAll(
+    public String findAll(
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNumber,
             @RequestParam(defaultValue = "10") @Positive @Max(100) int pageSize,
             @RequestParam(defaultValue = "name") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
-            @RequestParam(required = false) String name) {
+            @RequestParam(required = false) String name,
+            Model model) {
 
-        ModelAndView mv = new ModelAndView("caloteiros/list-caloteiros");
-
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortField).ascending());
-
-        if (sortOrder.equalsIgnoreCase("desc")) {
-            pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortField).descending());
-        }
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortOrder) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortField));
 
         CaloteiroPageDTO caloteirosPage;
 
         if (name == null || name.isBlank()) {
-            caloteirosPage = caloteiroService.listByUser(pageNumber, pageSize, sortField, sortOrder);
+            caloteirosPage = caloteiroService.listByUser(pageable.getPageNumber(), pageable.getPageSize(), sortField, sortOrder);
         } else {
             caloteirosPage = caloteiroService.searchByName(name, pageable);
         }
 
-        mv.addObject("caloteirosPage", caloteirosPage);
-        mv.addObject("sortField", sortField);
-        mv.addObject("sortOrder", sortOrder);
-        mv.addObject("searchQuery", name);
-        return mv;
+        model.addAttribute("caloteirosPage", caloteirosPage);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortOrder", sortOrder);
+        model.addAttribute("searchQuery", name);
+        return "caloteiros/list-caloteiros";
     }
 
     @GetMapping("/new")
-    public ModelAndView displayCaloteiroForm() {
-        ModelAndView model = new ModelAndView("caloteiros/new-caloteiro");
-        return model;
+    public String displayCaloteiroForm(Model model) {
+        model.addAttribute("createCaloteiroDTO",
+                new CreateCaloteiroDTO("", "", BigDecimal.ZERO, LocalDate.now()));
+        return "caloteiros/new-caloteiro";
     }
 
     @PostMapping
-    public ModelAndView createCaloteiro(
+    public String createCaloteiro(
             @Valid @ModelAttribute CreateCaloteiroDTO createCaloteiroDTO,
-            BindingResult bindingResult) {
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            return new ModelAndView("caloteiros/new-caloteiro");
+            return "caloteiros/new-caloteiro";
         }
 
-        this.caloteiroService.create(createCaloteiroDTO);
+        caloteiroService.create(createCaloteiroDTO);
 
-        return new ModelAndView("caloteiros/caloteiro-created");
+        redirectAttributes.addFlashAttribute("successMessage", "Caloteiro cadastrado com sucesso");
+        return "redirect:/caloteiros";
     }
 
     @GetMapping("/{id}/edit")
-    public ModelAndView displayUpdateCaloteiroForm(@PathVariable Long id) {
-        ModelAndView mv = new ModelAndView();
-
-        CaloteiroDTO updateCaloteiro = caloteiroService.findById(id);
-        mv.setViewName("caloteiros/update-caloteiro");
-        mv.addObject("updateCaloteiro", updateCaloteiro);
-
-        return mv;
+    public String displayUpdateCaloteiroForm(@PathVariable Long id, Model model) {
+        model.addAttribute("updateCaloteiroDTO", caloteiroService.findById(id));
+        model.addAttribute("caloteiroId", id);
+        return "caloteiros/update-caloteiro";
     }
 
     @PutMapping("/{id}")
-    public ModelAndView updateCaloteiro(
+    public String updateCaloteiro(
             @PathVariable Long id,
-            @Valid @ModelAttribute UpdateCaloteiroDTO updateCaloteiro,
-            BindingResult bindingResult) {
-
-        ModelAndView mv = new ModelAndView();
+            @Valid @ModelAttribute("updateCaloteiroDTO") UpdateCaloteiroDTO updateCaloteiroDTO,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
-            mv.setViewName("caloteiros/update-caloteiro");
-            return mv;
+            model.addAttribute("caloteiroId", id);
+            return "caloteiros/update-caloteiro";
         }
 
-        caloteiroService.update(id, updateCaloteiro);
+        caloteiroService.update(id, updateCaloteiroDTO);
 
-        mv.setViewName("redirect:/caloteiros/caloteiro-updated");
-        return mv;
+        redirectAttributes.addFlashAttribute("successMessage", "Caloteiro atualizado com sucesso");
+        return "redirect:/caloteiros";
     }
 
     @DeleteMapping("/{id}")
-    public ModelAndView deleteCaloteiroById(@PathVariable Long id) {
-
+    public String deleteCaloteiroById(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         caloteiroService.delete(id);
-        return new ModelAndView("redirect:/caloteiros/caloteiro-deleted");
-    }
-
-    @GetMapping("/caloteiro-updated")
-    public ModelAndView caloteiroUpdated() {
-        return new ModelAndView("caloteiros/caloteiro-updated");
-    }
-
-    @GetMapping("/caloteiro-deleted")
-    public ModelAndView caloteiroDeleted() {
-        return new ModelAndView("caloteiros/caloteiro-deleted");
+        redirectAttributes.addFlashAttribute("successMessage", "Caloteiro excluído com sucesso");
+        return "redirect:/caloteiros";
     }
 }

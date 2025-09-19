@@ -13,6 +13,9 @@ public class EmailService {
     @Value("${app.base-url}")
     private String appBaseUrl;
 
+    @Value("${mail.from.address}")
+    private String fromAddress;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
@@ -21,6 +24,7 @@ public class EmailService {
         String resetUrl = appBaseUrl + "/password/reset?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromAddress);
         message.setTo(email);
         message.setSubject(" Sistema Caloteiros | Redefinição de Senha");
         message.setText("Clique no link abaixo para redefinir sua senha:\n" + resetUrl);

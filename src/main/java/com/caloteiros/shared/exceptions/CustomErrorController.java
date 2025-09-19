@@ -2,37 +2,49 @@ package com.caloteiros.shared.exceptions;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class CustomErrorController implements ErrorController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomErrorController.class);
+
     @RequestMapping("/error")
-    public ModelAndView handleError(HttpServletRequest request) {
+    public String handleError(HttpServletRequest request, Model model) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        ModelAndView mv = new ModelAndView();
+        String viewName = "error/default-error";
+        String errorTitle = "Erro Inesperado";
+        String errorMessage = "Ocorreu um erro. Por favor, tente novamente";
 
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
 
             if (statusCode == HttpStatus.FORBIDDEN.value()) {
-                mv.setViewName("error/403");
-                mv.addObject("error", "Acesso negado");
-                mv.addObject("message", "Você não tem permissão para acessar este recurso.");
+                viewName = "error/403";
+                errorTitle = "403 - Acesso negado";
+                errorMessage = "Você não tem permissão para acessar este recurso.";
             } else if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                mv.setViewName("error/http-error");
-                mv.addObject("error", "404");
-                mv.addObject("message", "Página não encontrada.");
+                viewName = "error/http-error";
+                errorTitle = "404 - Página Não Encontrada";
+                errorMessage = "O recurso solicitado não foi encontrado." + request.getRequestURI();
             } else {
-                mv.setViewName("error/default-error");
-                mv.addObject("error", "500");
-                mv.addObject("message", "Erro interno do servidor.");
+                logger.error("Erro não tratado. Status: {}. URI: {}", statusCode, request.getRequestURI());
+                viewName = "error/http-error";
+                errorTitle = statusCode + " - Erro Interno";
+                errorMessage = "Ocorreu um erro inesperado do servidor.";
             }
+        } else {
+            logger.error("Erro não tratado sem código de status. URI: {}", request.getRequestURI());
         }
-        return mv;
+        model.addAttribute("error", errorTitle);
+        model.addAttribute("message", errorMessage);
+
+        return viewName;
     }
 }

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/includes/includes.jsp" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 	<head>
 	    <meta charset="UTF-8">
@@ -15,7 +16,7 @@
 	</head>
 	<body>
 		<header>
-			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/header.jsp" />
+			<c:import url="/WEB-INF/views/includes/header.jsp" />
 			<h1>Caloteiros</h1>
 		</header>
 		<main>
@@ -23,35 +24,43 @@
 				Usuário Logado: ${sessionScope.loggedUserName}
 			</p>
 
-			<form action="${pageContext.request.contextPath}/caloteiros" method="POST" id="formNewCaloteiro">
+            <form:form modelAttribute="createCaloteiroDTO" action="/caloteiros" method="POST" id="formNewCaloteiro">
 
 				<triadTag:textField
 					nameField="name" 
 					label="Nome:" 
 					id="labelName"
 					value="${createCaloteiroDTO.name()}" />
+                <form:errors path="name" cssClass="error-text" />
+
 				<triadTag:textField 
 					nameField="email" 
 					label="Email:" 
 					id="labelEmail"
 					value="${createCaloteiroDTO.email()}" />
+                <form:errors path="email" cssClass="error-text" />
+
 				<triadTag:textField 
 					nameField="debt" 
 					label="Devendo:" 
 					id="labelDebt"
 					value="${createCaloteiroDTO.debt()}" />
+                <form:errors path="debt" cssClass="error-text" />
+
 				<triadTag:textField 
 					nameField="debtDate" 
 					label="Data da Dívida:"
 					id="labelDate"
-					value="${createCaloteiroDTO.debtDate()}" />
+					value="${fn:formatLocalDate(createCaloteiroDTO.debtDate(), 'dd/MM/yyyy')}" />
+                <form:errors path="debtDate" cssClass="error-text" />
 					
 				<input type="submit" value="Cadastrar" />
-			</form>
-			<a href="/home" class="menu-link">Retornar ao Menu</a>
+			</form:form>
+
+			<a href= '<c:url value="/home"/>' class="menu-link">Retornar ao Menu</a>
 		</main>
 		<footer>
-			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />
+			<c:import url="/WEB-INF/views/includes/footer.jsp" />
 		</footer>
 	</body>
 </html>

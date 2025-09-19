@@ -7,7 +7,6 @@ import com.caloteiros.user.domain.entities.User;
 import com.caloteiros.user.domain.exceptions.UserException;
 import com.caloteiros.user.domain.repositories.UserRepository;
 import com.caloteiros.user.domain.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,8 +58,7 @@ public class AuthController {
 
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
-        model.addAttribute("registerRequest", new RegisterRequestDTO("", "", ""));
-        model.addAttribute("errors", new ArrayList<String>());
+        model.addAttribute("registerRequest", new RegisterRequestDTO("", "", "", ""));
         return "auth/register";
     }
 
@@ -95,7 +94,7 @@ public class AuthController {
         session.setAttribute("JWT_TOKEN", token);
         session.setAttribute("AUTHENTICATED_USER", user);
         session.setAttribute("loggedUserId", user.getId());
-        session.setAttribute("loggedUserName", user.getUsername());
+        session.setAttribute("loggedUserName", user.getName());
 
         logger.info("Usuário com email '{}' (ID: {}) autenticado com sucesso.", user.getEmail(), user.getId());
 
@@ -104,36 +103,29 @@ public class AuthController {
 
     @PostMapping("/register")
     public String processRegister(
-            @Valid @ModelAttribute RegisterRequestDTO registerRequest,
+            @Valid @ModelAttribute("registerRequest") RegisterRequestDTO registerRequest,
             BindingResult bindingResult,
-            Model model,
-            HttpSession session) {
+            RedirectAttributes redirectAttributes) {
 
         logger.info("Tentativa de registro para o email: {}", registerRequest.email());
 
-        if (bindingResult.hasErrors()) {
-            List<String> errors = bindingResult.getAllErrors().stream()
-                    .map(error -> error.getDefaultMessage())
-                    .collect(Collectors.toList());
-
-            logger.warn("Falha na validação dos dados de registro para o email '{}': {}", registerRequest.email(), errors);
-            model.addAttribute("errors", errors);
-            return "auth/register";
+        if (!registerRequest.password().equals(registerRequest.confirmPassword())) {
+            bindingResult.rejectValue("confirmPassword", "password.mismatch", "As senhas não coincidem.");
         }
 
-        User user = registerRequest.toUser();
+        if (bindingResult.hasErrors()) {
+            return "auth/register";
+        }
 
         try {
-            userService.createUser(user);
+            userService.createUser(registerRequest.toUser());
         } catch (UserException e) {
-            logger.warn("Falha ao registrar usuário com email '{}': {}", user.getEmail(), e.getMessage());
-            model.addAttribute("errors", Collections.singletonList(e.getMessage()));
+            bindingResult.rejectValue("email", "user.exists", e.getMessage());
+            logger.warn("Falha ao registrar usuário com email '{}': {}", registerRequest.email(), e.getMessage());
             return "auth/register";
         }
 
-        String token = this.tokenService.generateToken(user);
-        session.setAttribute("JWT_TOKEN", token);
-        session.setAttribute("AUTHENTICATED_USER", user);
-        return "redirect:/auth/login";
+        redirectAttributes.addFlashAttribute("successMessage", "Usuário registrado com sucesso! Por favor, faça o login.");
+        return "redirect:/auth/login?success";
     }
 }

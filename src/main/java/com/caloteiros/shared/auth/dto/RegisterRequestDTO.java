@@ -14,7 +14,11 @@ public record RegisterRequestDTO(
 
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    String password
+    String password,
+
+    @NotBlank(message = "Confirmação de Senha deve corresponder a Senha")
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
+    String confirmPassword
 ) {
     public User toUser() {
         return new User(null, this.name, this.email, this.password);

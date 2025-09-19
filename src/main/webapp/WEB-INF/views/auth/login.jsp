@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ include file="/WEB-INF/views/includes/includes.jsp" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 	<head>
 	    <meta charset="UTF-8">
@@ -15,22 +16,36 @@
 	</head>
 	<body>
 		<header>
-			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/header.jsp" />
+			<c:import url="/WEB-INF/views/includes/header.jsp" />
 			<h1>Caloteiros</h1>
 		</header>
 		<main>
-			<form action="${pageContext.request.contextPath}/auth/login" method="POST" id="formLogin">
+			<form:form modelAttribute="loginRequest" action="/auth/login" method="POST" id="formLogin">
+                <c:if test="${param.error}">
+                    <div class="error">
+                        <p>Email ou senha inválidos.</p>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.success}">
+                    <div class="success">
+                        <p>Usuário registrado com sucesso. Por favor, faça o login.</p>
+                    </div>
+                </c:if>
 
 				<triadTag:textField
 					nameField="email"
 					label="Email:"
 					id="labelEmail"
 					value="" />
+                <form:errors path="email" cssClass="error-text" />
+
 				<triadTag:password
 					passwordField="password"
 					label="Password:"
 					id="labelPassword"
 					value="" />
+                <form:errors path="password" cssClass="error-text" />
 
                 <c:if test="${not empty errors}">
                     <div class="error">
@@ -41,14 +56,14 @@
                 </c:if>
 
 				<input type="submit" value="Login" />
-			</form>
+			</form:form>
 			<div class="links-below-form">
-                <a href="/password/forgot" id="link-new-user">Esqueceu sua senha?</a>
-                <a href="/auth/register" id="link-new-user">Não tem uma conta? Cadastre-se</a>
+                <a href='<c:url value="/password/forgot"/>' id="link-new-user">Esqueceu sua senha?</a>
+                <a href='<c:url value="/auth/register"/>' id="link-new-user">Não tem uma conta? Cadastre-se</a>
             </div>
 		</main>
 		<footer>
-			<c:import url="${pageContext.request.contextPath}/WEB-INF/views/includes/footer.jsp" />
+			<c:import url="/WEB-INF/views/includes/footer.jsp" />
 		</footer>
 	</body>
 </html>

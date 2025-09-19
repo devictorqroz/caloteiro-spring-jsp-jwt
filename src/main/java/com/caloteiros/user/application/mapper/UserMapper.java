@@ -10,14 +10,14 @@ public class UserMapper {
 
     public UserDTO toUserDTO(User user) {
         return new UserDTO(
-                user.getUsername(),
+                user.getName(),
                 user.getEmail(),
                 user.getPassword()
         );
     }
 
     public User fromUpdateToEntity(UpdateUserDTO dto, User user) {
-        user.setUsername(dto.name());
+        user.setName(dto.name());
         user.setEmail(dto.email());
         return user;
     }

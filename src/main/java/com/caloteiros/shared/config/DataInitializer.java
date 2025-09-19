@@ -34,7 +34,7 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Criando usuário de demonstração para a API.");
 
         User demoUser = new User();
-        demoUser.setUsername("Usuário Demo");
+        demoUser.setName("Usuário Demo");
         demoUser.setEmail(demoEmail);
         demoUser.setPassword(passwordEncoder.encode("password"));
 

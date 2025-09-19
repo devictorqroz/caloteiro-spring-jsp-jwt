@@ -4,95 +4,55 @@ import com.caloteiros.caloteiro.domain.exceptions.CaloteiroException;
 import com.caloteiros.user.domain.exceptions.PasswordException;
 import com.caloteiros.user.domain.exceptions.PasswordResetTokenException;
 import com.caloteiros.user.domain.exceptions.UserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @ControllerAdvice
 public class ApplicationExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ModelAndView handleGeneralException() {
-        return createErrorModelAndView("error/default-error", "Erro",
-                "Ocorreu um erro no servidor.");
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationExceptionHandler.class);
+
+    @ExceptionHandler({
+            CaloteiroException.class,
+            UserException.class,
+            PasswordException.class,
+            PasswordResetTokenException.class,
+            IllegalArgumentException.class,
+            MethodArgumentNotValidException.class
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleBusinessException(Exception ex, Model model) {
+        logger.warn("Uma exceção de negócio foi tratada: {}", ex.getMessage());
+        model.addAttribute("error", "Requisição inválida");
+        model.addAttribute("message", ex.getMessage());
+        return "error/default-error";
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ModelAndView handleDatabaseException() {
-        return createErrorModelAndView("error/sql-error", "SQL Error",
-                "Erro com a operação no banco de dados, verifique a transação.");
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ModelAndView handleBadRequest(MethodArgumentNotValidException ex) {
-        StringBuilder message = new StringBuilder("Os dados fornecidos são inválidos: ");
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                message.append(error.getField()).append(" ").append(error.getDefaultMessage()).append(". ")
-        );
-        return createErrorModelAndView("error/http-error", "400 - Requisição inválida", message.toString());
-    }
-
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ModelAndView handleNotFound(NoHandlerFoundException ex) {
-        ModelAndView mv = createErrorModelAndView("error/http-error", "404 - Recurso não encontrado",
-                "A página que você está procurando não existe.");
-        mv.setStatus(HttpStatus.NOT_FOUND);
-        return mv;
-    }
-
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ModelAndView handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
-        ModelAndView mv = createErrorModelAndView("error/http-error", "405 - Método HTTP não suportado", "O método " + ex.getMethod() + " não é permitido para esta requisição.");
-        mv.setStatus(HttpStatus.METHOD_NOT_ALLOWED);
-        return mv;
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleDatabaseException(DataAccessException ex, Model model) {
+        logger.error("Exceção de acesso a dados ocorreu:", ex);
+        model.addAttribute("error", "Erro de Banco de Dados");
+        model.addAttribute("message", "Ocorreu um erro ao acessar o banco de dados. Por favor, tente novamente mais tarde.");
+        return "error/sql-error";
     }
 
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleInternalServerError() {
-        ModelAndView mv = createErrorModelAndView("error/http-error", "500 - Erro interno do servidor", "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
-        mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        return mv;
-    }
-
-    @ExceptionHandler(CaloteiroException.class)
-    public ModelAndView handleCaloteiroException(CaloteiroException ex) {
-        return createErrorModelAndView("error/caloteiro-error",
-                "Erro na operação com Caloteiro", ex.getMessage());
-    }
-
-    @ExceptionHandler(UserException.class)
-    public ModelAndView handleUserException(UserException ex) {
-        return createErrorModelAndView("error/user-error",
-                "Erro na operação com Usuário", ex.getMessage());
-    }
-
-    @ExceptionHandler(PasswordException.class)
-    public ModelAndView handlePasswordException(PasswordException ex) {
-        return createErrorModelAndView("error/user-error",
-                "Erro na operação com Usuário", ex.getMessage());
-    }
-
-    @ExceptionHandler(PasswordResetTokenException.class)
-    public ModelAndView handleTokenPasswordException(PasswordResetTokenException ex) {
-        return createErrorModelAndView("error/user-error",
-                "Erro com Token de recuperação de password", ex.getMessage());
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ModelAndView handleIllegalArgumentException(IllegalArgumentException ex) {
-        return createErrorModelAndView("error/default-error",
-                "Erro com os campos de orndeção da listagem", ex.getMessage());
-    }
-
-    private ModelAndView createErrorModelAndView(String viewName, String error, String message) {
-        ModelAndView mv = new ModelAndView(viewName);
-        mv.addObject("error", error);
-        mv.addObject("message", message);
-        return mv;
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleInternalServerError(Exception ex, Model model) {
+        logger.error("Erro interno inesperado foi capturado:", ex);
+        model.addAttribute("error", "500 - Erro interno do servidor");
+        model.addAttribute("message", "Ocorreu um erro inesperado. Nossa equipe foi notificada");
+        return "error/http-error";
     }
 }
