@@ -230,7 +230,7 @@ Este projeto foi desenvolvido por:
 ## ⚖️ Licença
 
 Este projeto está sob a licença **MIT**.  
-Para mais detalhes, veja o arquivo [LICENSE.md](LICENSE.md).
+Para mais detalhes, veja o arquivo [LICENSE](https://github.com/devictorqroz/caloteiro-spring-jsp-jwt/blob/main/LICENSE).
 
 <br>
 
