@@ -1,7 +1,7 @@
-<h1 align="center">Projeto Caloteiros (CRUD com JSP e JWT)</h1>
+<h1 align="center">Caloteiros — Sistema de Gerenciamento de Devedores</h1>
 
 <p align="center">
-  <strong>Um sistema web monolítico para gerenciamento de devedores, construído com Java, Spring Boot, JSP e JWT.</strong>
+  <strong>Aplicação web monolítica desenvolvida com Java 17 e Spring Boot para gerenciamento de devedores, com autenticação JWT, persistência em MySQL, APIs REST, documentação OpenAPI e execução containerizada com Docker.</strong>
 </p>
 
 <br>
